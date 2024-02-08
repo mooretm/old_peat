@@ -31,6 +31,9 @@ PLAY_ICON = IMAGE_DIRECTORY / 'menu_icons' / 'play-fill.png'
 AUDIO_ICON = IMAGE_DIRECTORY / 'menu_icons' /  'speaker.png'
 CALIBRATION_ICON = IMAGE_DIRECTORY / 'menu_icons' /  'sliders2-vertical.png'
 
+# Data menu
+CALCULATOR_ICON = IMAGE_DIRECTORY / 'menu_icons' / 'calculator.png'
+
 # Help menu
 ABOUT_ICON = IMAGE_DIRECTORY / 'menu_icons' /  'info-square.png'
 HELP_ICON = IMAGE_DIRECTORY / 'menu_icons' /  'file-earmark-text.png'

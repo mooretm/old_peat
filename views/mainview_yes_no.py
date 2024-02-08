@@ -41,9 +41,9 @@ class MainFrame(ttk.Frame):
         # Header #
         ##########
         # Heading
-        tk.Label(self, text="Threshold Search", bg=custom_color,
-                 font=('TkDefaultFont', 20)).grid(
-                     row=1, column=5, sticky='nsew')
+        # tk.Label(self, text="P.E.A.T.", 
+        #          bg=custom_color, font=('TkDefaultFont', 13)).grid(
+        #              row=1, column=5, sticky='nsew')
 
         #################
         # Create frames #

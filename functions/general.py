@@ -26,12 +26,17 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-def truncate_path(long_path):
+def truncate_path(long_path, **kwargs):
     """ Truncate path (if necessary) and return 
         shortened path for display
     """
-    if len(long_path) >= 60:
-        short = '...' + long_path[-55:]
+    if 'length' in kwargs:
+        length = kwargs['length']
+    else:
+        length = 60
+
+    if len(long_path) >= length:
+        short = '...' + long_path[-(length-5):]
         return short
     else:
         if long_path == "":

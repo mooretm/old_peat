@@ -31,10 +31,11 @@ class SessionParsModel:
         'test_freqs': {'type': 'str', 'value': "500, 1000, 2000, 4000"},
         'duration': {'type': 'float', 'value': 2},
         'step_sizes': {'type': 'str', 'value': "10, 5, 5, 2, 2"},
-        'nReversals': {'type': 'str', 'value': 5},
+        'num_reversals': {'type': 'int', 'value': 5},
         #'presentations': {'type': 'int', 'value': 1},
         'starting_level': {'type': 'float', 'value': 30},
         'rapid_descend': {'type': 'str', 'value': 'Yes'},
+        #'reversals_to_average': {'type': 'int', 'value': 2},
 
         # # Stimulus variables
         # 'audio_files_dir': {'type': 'str', 'value': 'Please select a folder'},

@@ -1,12 +1,11 @@
-# **Change Log**
-
+<h1 style="text-align: center;">Change Log: P.E.A.T.</h1>
 ---
 
-## v0.0.0
+## Version 0.1.0
 
-Date: July 19, 2023
+Date: February 08, 2024
 
 ### Initial Release
-1. Empty GUI framework for development. 
+1. Application for estimating auditory thresholds using a 2IAFC task.
 <br>
 <br>

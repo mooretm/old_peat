@@ -1,4 +1,5 @@
-""" Threshold Search. 
+""" Field Attenuation Estimation System (FAES) for SoundGear 
+    NRR measuremetns. 
 
     Written by: Travis M. Moore
     Created: January 4, 2024
@@ -43,6 +44,7 @@ from views import mainview_yes_no
 from views import sessionview
 from views import audioview
 from views import calibrationview
+from views import thresholdview
 # Images
 from app_assets import images
 # Help
@@ -61,9 +63,9 @@ class Application(tk.Tk):
         #############
         # Constants #
         #############
-        self.NAME = 'Threshold Search'
+        self.NAME = 'P.E.A.T.'
         self.VERSION = '0.1.0'
-        self.EDITED = 'January 10, 2024'
+        self.EDITED = 'February 08, 2024'
 
         # Create menu settings dictionary
         self._app_info = {
@@ -95,6 +97,8 @@ class Application(tk.Tk):
 
         # First trial flag
         self._first_run_flag = True
+
+        self.trial = 0
 
         # Load current session parameters from file
         # or load defaults if file does not exist yet
@@ -134,6 +138,9 @@ class Application(tk.Tk):
             '<<ToolsAudioSettings>>': lambda _: self._show_audio_dialog(),
             '<<ToolsCalibration>>': lambda _: self._show_calibration_dialog(),
 
+            # Data menu
+            '<<DataCalculateThresholds>>': lambda _: self.show_scoring_dialog(),
+
             # Help menu
             '<<HelpREADME>>': lambda _: self._show_help(),
             '<<HelpChangelog>>': lambda _: self._show_changelog(),
@@ -153,13 +160,15 @@ class Application(tk.Tk):
             '<<MainOne>>': lambda _: self._on_1(),
             '<<MainTwo>>': lambda _: self._on_2(),
             '<<MainSubmit>>': lambda _: self._on_submit(),
-            '<<MainDemo>>': lambda _: self._demo(),
-            #'<<MainArrowButton>>': lambda _: self._on_arrow_button(),
         }
 
         # Bind callbacks to sequences
         for sequence, callback in event_callbacks.items():
             self.bind(sequence, callback)
+
+        """ Temporarily disable help menu until ready. """
+        self.menu.help_menu.entryconfig('README...', state='disabled')
+
 
         # Center main window
         self.center_window()
@@ -231,19 +240,6 @@ class Application(tk.Tk):
             length=self.winfo_width()
         )
         self.progress_bar.grid(row=10, column=5, columnspan=40, sticky='nsew')
-
-
-    def start_demo(self):
-        """ Start a new trial. """
-        for ii in range(0, self.sessionpars['presentations'].get()):
-            for f in self.stim_dict:
-                print(f"\ncontroller: {f} Hz")
-                self.present_audio(
-                    audio=self.stim_dict[f],
-                    pres_level=self.sessionpars['adjusted_level_dB'].get(),
-                    sampling_rate=self.FS
-                )
-                time.sleep(self.sessionpars['duration'].get() + 0.5)
 
 
     def _quit(self):
@@ -319,7 +315,7 @@ class Application(tk.Tk):
             nUp=1,
             nDown=2,
             nTrials=0,
-            nReversals=len(steps),# Update with new field in sessionview
+            nReversals=self.sessionpars['num_reversals'].get(),
             rapid_descend=rd,
             min_val=-10,
             max_val=80
@@ -331,7 +327,8 @@ class Application(tk.Tk):
 
     def _new_trial(self):
         # Print message to console
-        self.msg = f"Trial {self.staircase._trial_num}: {self.current_freq} Hz"
+        #self.msg = f"Trial {self.staircase._trial_num}: {self.current_freq} Hz"
+        self.msg = f"Trial {self.trial}: {self.current_freq} Hz"
         print('')
         print('*' * 60)
         print(self.msg)
@@ -417,59 +414,74 @@ class Application(tk.Tk):
         else: 
             self.staircase.add_response(-1)
 
+        # Save the trial data
+        self._save_trial_data()
+
+        # Update trial counter
+        self.trial += 1
+
         # Check for end of staircase
         if not self.staircase.status:
             print(f"\ncontroller: Session complete on Submit")
             # Call start_new_run to get next frequency
             self.start_new_run()
-            # self._quit()
         else:
             self._new_trial()
 
-    #     # Save the trial data
-    #     self._save_trial_data()
 
- 
-    # def _save_trial_data(self):
-    #     """ Select data to save and send to csv model.
-    #     """
-    #     # Get tk variable values
-    #     converted = dict()
-    #     for key in self.sessionpars:
-    #         converted[key] = self.sessionpars[key].get()
+    def _save_trial_data(self):
+        """ Select data to save and send to csv model.
+        """
+        # Get tk variable values
+        converted = dict()
+        for key in self.sessionpars:
+            converted[key] = self.sessionpars[key].get()
 
-    #     # Define selected items for writing to file
-    #     save_list = ['subject', 'condition', 'randomize', 'repetitions', 
-    #         'slm_reading', 'cal_level_dB', 'slm_offset', 'desired_level_dB',
-    #         'adjusted_level_dB']
+        # Add most recent datapoint object attributes to dict
+        converted.update(self.staircase.dw.datapoints[-1].__dict__)
 
-    #     # Create new dict with desired items
-    #     try:
-    #         data = dict((k, converted[k]) for k in save_list)
-    #     except KeyError as e:
-    #         print('\ncontroller: Unexpected variable when attempting ' +
-    #               f'to save: {e}')
-    #         messagebox.showerror(
-    #             title="Undefined Variable",
-    #             message="Data not saved!",
-    #             detail=f'{e} is undefined.'
-    #         )
-    #         self.destroy()
-    #         return
+        # Add 1 to trial number
+        converted['trial'] = self.trial + 1
+        #converted['trial_number'] += 1
 
-    #     # Write data to file
-    #     print('controller: Calling save record function...')
-    #     try:
-    #         self.csvmodel.save_record(data)
-    #     except PermissionError as e:
-    #         print(e)
-    #         messagebox.showerror(
-    #             title="Access Denied",
-    #             message="Data not saved! Cannot write to file!",
-    #             detail=e
-    #         )
-    #         self.destroy()
-    #         return
+        # Add current test frequency to dict
+        converted['test_freq'] = self.current_freq
+
+        # Define selected items for writing to file
+        save_list = [
+            'trial', 'subject', 'condition', 'stimulus_type', 
+            'duration', 'step_sizes', 'num_reversals', 'rapid_descend', 
+            'slm_reading', 'cal_level_dB', 'slm_offset', 'adjusted_level_dB', 
+             'desired_level_dB', 'test_freq', 'response', 'reversal'
+        ]
+
+        # Create new dict with desired items
+        try:
+            data = dict((k, converted[k]) for k in save_list)
+        except KeyError as e:
+            print('\ncontroller: Unexpected variable when attempting ' +
+                  f'to save: {e}')
+            messagebox.showerror(
+                title="Undefined Variable",
+                message="Data not saved!",
+                detail=f'{e} is undefined.'
+            )
+            self.destroy()
+            return
+
+        # Write data to file
+        print('controller: Attempting to save record')
+        try:
+            self.csvmodel.save_record(data)
+        except PermissionError as e:
+            print(e)
+            messagebox.showerror(
+                title="Access Denied",
+                message="Data not saved! Cannot write to file!",
+                detail=e
+            )
+            self.destroy()
+            return
 
 
     ############################
@@ -524,6 +536,14 @@ class Application(tk.Tk):
         """
         print("\ncontroller: Calling calibration dialog...")
         calibrationview.CalibrationDialog(self, self.sessionpars)
+
+
+    #######################
+    # Data Menu Functions #
+    #######################
+    def show_scoring_dialog(self):
+        print("\ncontroller: Calling matrix dialog")
+        thresholdview.ThresholdDialog(self)
 
 
     ################################

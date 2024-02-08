@@ -96,7 +96,7 @@ class SessionDialog(tk.Toplevel):
         ttk.Label(frm_options, text="Reversals:"
             ).grid(row=27, column=5, sticky='e', **widget_options)
         ttk.Entry(frm_options, width=20, 
-            textvariable=self.sessionpars['nReversals']
+            textvariable=self.sessionpars['num_reversals']
             ).grid(row=27, column=10, sticky='w')
 
         # Number of Presentations

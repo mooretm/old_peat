@@ -49,6 +49,9 @@ class MainMenu(tk.Menu):
             'tools_audio': tk.PhotoImage(file=images.AUDIO_ICON),
             'tools_calibration': tk.PhotoImage(file=images.CALIBRATION_ICON),
 
+            # Data menu
+            'data_calculator': tk.PhotoImage(file=images.CALCULATOR_ICON),
+
             # Help menu
             'help_about': tk.PhotoImage(file=images.ABOUT_ICON),
             'help_help': tk.PhotoImage(file=images.HELP_ICON),
@@ -112,6 +115,20 @@ class MainMenu(tk.Menu):
         self.add_cascade(label="Tools", menu=tools_menu)
 
 
+        #############
+        # Data Menu #
+        #############
+        data_menu = tk.Menu(self, tearoff=False)
+        data_menu.add_command(
+            label='Calculate Thresholds...',
+            command=self._event('<<DataCalculateThresholds>>'),
+            image=self.icons['data_calculator'],
+            compound=tk.LEFT,
+        )
+        # Add Data menu to the menubar
+        self.add_cascade(label="Data", menu=data_menu)
+
+
         #################
         # Playback Menu #
         #################
@@ -133,27 +150,27 @@ class MainMenu(tk.Menu):
         #############
         # Help Menu #
         #############
-        help_menu = tk.Menu(self, tearoff=False)
-        help_menu.add_command(
+        self.help_menu = tk.Menu(self, tearoff=False)
+        self.help_menu.add_command(
             label='About...',
             command=self.show_about,
             image=self.icons['help_about'],
             compound=tk.LEFT,
         )
-        help_menu.add_command(
+        self.help_menu.add_command(
             label='README...',
             command=self._event('<<HelpREADME>>'),
             image=self.icons['help_help'],
             compound=tk.LEFT,
         )
-        help_menu.add_command(
+        self.help_menu.add_command(
             label="Change Log...",
             command=self._event('<<HelpChangelog>>'),
             image=self.icons['help_changelog'],
             compound=tk.LEFT,
         )
         # Add help menu to the menubar
-        self.add_cascade(label="Help", menu=help_menu)
+        self.add_cascade(label="Help", menu=self.help_menu)
 
 
         #####################
