@@ -65,7 +65,7 @@ class Application(tk.Tk):
         #############
         self.NAME = 'P.E.A.T.'
         self.VERSION = '0.1.0'
-        self.EDITED = 'February 08, 2024'
+        self.EDITED = 'February 12, 2024'
 
         # Create menu settings dictionary
         self._app_info = {
@@ -352,10 +352,13 @@ class Application(tk.Tk):
         # Apply offset to desired dB level
         # (Also update sessionpars)
         self._calc_level(self.staircase.current_level)
+
+        # Pause
+        time.sleep(0.5)
         
         # Interval 1
         self.main_frame.interval_1_colors()
-        self.update_idletasks()
+        #self.update_idletasks()
         if self.stim_interval == 1:
             self.present_audio(
                 audio=wt,
@@ -367,12 +370,12 @@ class Application(tk.Tk):
 
         # ISI
         self.main_frame.clear_interval_colors()
-        self.update_idletasks()
+        #self.update_idletasks()
         time.sleep(0.5)
 
         # Interval 2
         self.main_frame.interval_2_colors()
-        self.update_idletasks()
+        #self.update_idletasks()
         if self.stim_interval == 2:
             self.present_audio(
                 audio=wt,
@@ -384,7 +387,7 @@ class Application(tk.Tk):
 
         # End
         self.main_frame.clear_interval_colors()
-        self.update_idletasks()
+        #self.update_idletasks()
 
 
     ########################

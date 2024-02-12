@@ -109,8 +109,6 @@ class MainFrame(ttk.Frame):
             )
         self.btn_submit.grid(row=10, column=5)
 
-        #ttk.Button(frm_submit, text="Demo", command=self._demo).grid(row=15, column=5)
-
 
     #############
     # Functions #
@@ -136,24 +134,22 @@ class MainFrame(ttk.Frame):
         self.event_generate('<<MainSubmit>>')
 
 
-    def _demo(self):
-        """ Play short, automated demo of a trial and response. """
-        self.event_generate('<<MainDemo>>')
-
-
     def interval_1_colors(self):
         self.box1.config(bg='blue')
         self.box2.config(bg=self._default_color)
+        self.update_idletasks()
 
 
     def interval_2_colors(self):
         self.box1.config(bg=self._default_color)
         self.box2.configure(bg='blue')
+        self.update_idletasks()
 
 
     def clear_interval_colors(self):
         self.box1.config(bg=self._default_color)
         self.box2.config(bg=self._default_color)
+        self.update_idletasks()
 
 
     def show_response(self, response):
@@ -162,6 +158,3 @@ class MainFrame(ttk.Frame):
 
     def clear_response(self):
         self.text_var.set("Your Response:")
-
-
-

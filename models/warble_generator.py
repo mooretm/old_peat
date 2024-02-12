@@ -1,9 +1,24 @@
+""" Warble tone (FM) generator. 
+
+    Written by: Travis M. Moore
+    Last edited: 02/09/2024
+"""
+
+###########
+# Imports #
+###########
+# Data Science
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import spectrogram
+
+# Audio
 import sounddevice as sd
 
 
+#########
+# BEGIN #
+#########
 def warble_tone(fc, mod_depth, mod_rate, dur, fs=48000):
     """ Generate a warble tone. Optionally, play the tone using the 
         sounddevice library, and display spectrogram and power 
