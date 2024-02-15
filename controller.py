@@ -15,6 +15,7 @@ from tkinter import messagebox
 
 # Data Science
 import random
+import numpy as np
 
 # System
 from pathlib import Path
@@ -64,8 +65,8 @@ class Application(tk.Tk):
         # Constants #
         #############
         self.NAME = 'P.E.A.T.'
-        self.VERSION = '0.1.0'
-        self.EDITED = 'February 12, 2024'
+        self.VERSION = '1.0.0'
+        self.EDITED = 'February 15, 2024'
 
         # Create menu settings dictionary
         self._app_info = {
@@ -167,7 +168,7 @@ class Application(tk.Tk):
             self.bind(sequence, callback)
 
         """ Temporarily disable help menu until ready. """
-        self.menu.help_menu.entryconfig('README...', state='disabled')
+        #self.menu.help_menu.entryconfig('README...', state='disabled')
 
 
         # Center main window
@@ -271,11 +272,15 @@ class Application(tk.Tk):
             self.NUM_FREQS = len(self.FREQS)
 
             self._first_run_flag = False
-        
+            
         # Get next frequency or end
         try:
             self.current_freq = self.freqs.pop(0)
             print(f"\ncontroller: Testing {self.current_freq} Hz")
+            messagebox.showinfo(
+                title="Ready",
+                message="When you are ready, close this window to continue."
+            )
         except IndexError:
             print(f"\ncontroller: Session ended by start_new_run")
             messagebox.showinfo(
@@ -317,17 +322,40 @@ class Application(tk.Tk):
             nTrials=0,
             nReversals=self.sessionpars['num_reversals'].get(),
             rapid_descend=rd,
-            min_val=-10,
-            max_val=80
+            min_val=self.sessionpars['min_level'].get(),
+            max_val=self.sessionpars['max_level'].get()
         )
 
         # Start first trial
         self._new_trial()
 
 
+    def _create_stimulus(self):
+        stim_chans = self.sessionpars['num_stim_chans'].get()
+
+        # List to hold each warble tone
+        sig_list = []
+        for ii in range(0,stim_chans):
+            # Generate warble tone based on current freq
+            wt = general.warble_tone(
+                dur=self.sessionpars['duration'].get(),
+                fs=self.FS, 
+                fc=self.current_freq,
+                mod_rate=5,
+                mod_depth=5
+            )
+            # Apply gating
+            wt = general.doGate(wt, rampdur=0.04, fs=self.FS)
+            sig_list.append(np.array(wt))
+
+        sig_list = np.array(sig_list).T
+        print(f"\ncontroller: signal shape: {sig_list.shape}")
+
+        return sig_list
+
+
     def _new_trial(self):
         # Print message to console
-        #self.msg = f"Trial {self.staircase._trial_num}: {self.current_freq} Hz"
         self.msg = f"Trial {self.trial}: {self.current_freq} Hz"
         print('')
         print('*' * 60)
@@ -338,16 +366,17 @@ class Application(tk.Tk):
         self.stim_interval = self._assign_stimulus_interval()
         print(f"controller: Stimulus is in interval {self.stim_interval}")
 
-        # Generate warble tone based on current freq
-        wt = general.warble_tone(
-            dur=self.sessionpars['duration'].get(),
-            fs=self.FS, 
-            fc=self.current_freq,
-            mod_rate=5,
-            mod_depth=5
-        )
-        # Apply gating
-        wt = general.doGate(wt, rampdur=0.04, fs=self.FS)
+        # Generate stimulus
+        wt = self._create_stimulus()
+
+        # # Plot first two cycles to illustrate random starting phase
+        # period = 1/self.current_freq
+        # samps = int(period * self.FS)
+        # samps = samps * 2
+        # for chan in range(0, wt.shape[1]):
+        #     plt.plot(wt[:samps, chan])
+        #     plt.show()
+        #     plt.close()
 
         # Apply offset to desired dB level
         # (Also update sessionpars)
@@ -425,7 +454,9 @@ class Application(tk.Tk):
 
         # Check for end of staircase
         if not self.staircase.status:
-            print(f"\ncontroller: Session complete on Submit")
+            print(f"\ncontroller: End of staircase!")
+            if self.sessionpars['disp_plots'].get() == 1:
+                self.staircase.plot_data()
             # Call start_new_run to get next frequency
             self.start_new_run()
         else:
@@ -452,7 +483,7 @@ class Application(tk.Tk):
 
         # Define selected items for writing to file
         save_list = [
-            'trial', 'subject', 'condition', 'stimulus_type', 
+            'trial', 'subject', 'condition', 'min_level', 'max_level', 
             'duration', 'step_sizes', 'num_reversals', 'rapid_descend', 
             'slm_reading', 'cal_level_dB', 'slm_offset', 'adjusted_level_dB', 
              'desired_level_dB', 'test_freq', 'response', 'reversal'
@@ -473,7 +504,7 @@ class Application(tk.Tk):
             return
 
         # Write data to file
-        print('controller: Attempting to save record')
+        print('\ncontroller: Attempting to save record')
         try:
             self.csvmodel.save_record(data)
         except PermissionError as e:
@@ -545,7 +576,7 @@ class Application(tk.Tk):
     # Data Menu Functions #
     #######################
     def show_scoring_dialog(self):
-        print("\ncontroller: Calling matrix dialog")
+        print("\ncontroller: Calling threshold dialog")
         thresholdview.ThresholdDialog(self)
 
 

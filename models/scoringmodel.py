@@ -1,15 +1,14 @@
-""" Model to calculate thresholds from PET.
+""" Model to calculate thresholds from P.E.A.T.
 """
 
 ###########
 # Imports #
 ###########
 # GUI
-import tkinter as tk
-from tkinter import ttk
 from tkinter import filedialog
 
 # Data Science
+import numpy as np
 import pandas as pd
 
 # System
@@ -40,30 +39,69 @@ class ScoringModel:
         self.data.reset_index(drop=True, inplace=True)
 
 
+    def _avg_revs(self, df, num_reversals):
+        """ Custom function for use with Pandas apply().
+            Called from score().
+            Find last n reversals and average to calculate thresholds.
+        """
+        # Get indexes of last n reversals
+        last_n_indexes = df.index[df['reversal']==True].to_list()[-num_reversals:]
+
+        # Calculate thresholds
+        thresholds = np.round(np.mean(df['desired_level_dB'][last_n_indexes]), 2)
+
+        return thresholds
+        
+
     def score(self, num_reversals):
         # Validation
         if num_reversals <= 0:
             raise ValueError("Number of reversals cannot be 0 or negative!")
+
+        # Get dataframe of thresholds derived from the last n reversals
+        thresholds = self.data.groupby(
+            by=[
+                'subject', 
+                'condition', 
+                'test_freq'
+            ]
+        ).apply(self._avg_revs, num_reversals=num_reversals)
+
+        # Organize dataframe
+        thresholds_df = thresholds.reset_index()
+        thresholds_df = thresholds_df.rename(columns={0:'threshold'})
+
+        # Write thresholds to CSV
+        thresholds_df.to_csv('thresholds.csv', index=False)
+
+        print(f"\nscoringmodel: Thresholds written to CSV successfully")
+
+
+    # def score(self, num_reversals):
+    #     # Validation
+    #     if num_reversals <= 0:
+    #         raise ValueError("Number of reversals cannot be 0 or negative!")
         
-        # Calculate thresholds
-        thresholds = []
-        for sub in self.data['subject'].unique():
-            for freq in self.data['test_freq'].unique():
-                # Isolate the rows of interest
-                freq_mask = self.data['test_freq'] == freq
-                temp = self.data[freq_mask].copy()
-                reversal_mask = temp['reversal'] == True
-                temp = temp[reversal_mask]
-                temp.reset_index(drop=True, inplace=True)
-                print(temp)
+    #     # Calculate thresholds
+    #     thresholds = []
+    #     for sub in self.data['subject'].unique():
+    #         sub_data = self.data[self.data['subject']==sub].copy()
+    #         for freq in self.data['test_freq'].unique():
+    #             # Isolate the rows of interest
+    #             freq_mask = sub_data['test_freq'] == freq
+    #             temp = sub_data[freq_mask].copy()
+    #             reversal_mask = temp['reversal'] == True
+    #             temp = temp[reversal_mask]
+    #             temp.reset_index(drop=True, inplace=True)
+    #             print(temp)
 
-                # Calculate threshold and append to list
-                t = temp['desired_level_dB'][-num_reversals:].mean()
-                print(t)
-                thresholds.append((sub, freq, t,))
+    #             # Calculate threshold and append to list
+    #             t = temp['desired_level_dB'][-num_reversals:].mean()
+    #             print(t)
+    #             thresholds.append((sub, freq, t,))
 
-        # Create dataframe from list of tuples
-        df = pd.DataFrame(thresholds, columns=['subject', 'freq', 'threshold'])
-        df.to_csv('thresholds.csv', index=False)
+    #     # Create dataframe from list of tuples
+    #     df = pd.DataFrame(thresholds, columns=['subject', 'freq', 'threshold'])
+    #     df.to_csv('thresholds.csv', index=False)
 
-        print(df)
+    #     print(df)

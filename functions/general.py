@@ -45,6 +45,10 @@ def truncate_path(long_path, **kwargs):
             return long_path
 
 
+def add_channels(data, reps):
+    """ For creating """
+
+
 def warble_tone(dur, fs, fc, mod_rate, mod_depth):
     """ Create a warble tone. 
 
@@ -62,16 +66,22 @@ def warble_tone(dur, fs, fc, mod_rate, mod_depth):
 
         Written by: Travis M. Moore
         Created: 12/01/2023
-        Last edited: 01/05/2024
+        Last edited: 02/12/2024
     """
     # Create time vector
     t = np.arange(0, dur, 1/fs)
+
+    # Grab random phase value in degrees
+    phi_rad = np.radians(np.random.randint(0, 179))
+    #print(f"\ngeneral: Phase: {phi_rad}")
+
 
     # Synthesize warble tone
     wc = fc * 2 * np.pi
     wd = mod_rate * 2 * np.pi
     B = (mod_depth / 100) * wc # in radians
-    y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - (np.pi/2)) + 1))
+    #y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - (np.pi/2)) + 1))
+    y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - phi_rad) + 1))
 
     return y
 

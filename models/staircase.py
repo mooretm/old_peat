@@ -178,7 +178,7 @@ class Staircase:
         if self._trial_num >= self.nTrials:
             # Reversal stopping rule reached?
             if len(self.dw._get_reversals()) >= self.nReversals:
-                self.plot_data()
+                #self.plot_data()
                 self.status = False
                 print(f"\n\nstaircase: Task complete!\n")
 

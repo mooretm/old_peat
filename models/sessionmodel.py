@@ -21,22 +21,27 @@ class SessionParsModel:
         # Session variables
         'subject': {'type': 'str', 'value': '999'},
         'condition': {'type': 'str', 'value': 'TEST'},
+        'disp_plots': {'type': 'int', 'value': 0},
 
         # Stimulus option variables
+        'num_stim_chans': {'type': 'int', 'value': 1},
+        'test_freqs': {'type': 'str', 'value': "500, 1000, 2000, 4000"},
+        'duration': {'type': 'float', 'value': 2},
+        #'stimulus_type': {'type': 'str', 'value': "Warble Tone"},
+        #'presentations': {'type': 'int', 'value': 1},
         #'randomize': {'type': 'int', 'value': 0},
         #'repetitions': {'type': 'int', 'value': 1},
         #'big_step': {'type': 'int', 'value': 5},
         #'small_step': {'type': 'int', 'value': 2},
-        'stimulus_type': {'type': 'str', 'value': "Warble Tone"},
-        'test_freqs': {'type': 'str', 'value': "500, 1000, 2000, 4000"},
-        'duration': {'type': 'float', 'value': 2},
-        'step_sizes': {'type': 'str', 'value': "10, 5, 5, 2, 2"},
-        'num_reversals': {'type': 'int', 'value': 5},
-        #'presentations': {'type': 'int', 'value': 1},
-        'starting_level': {'type': 'float', 'value': 30},
-        'rapid_descend': {'type': 'str', 'value': 'Yes'},
-        #'reversals_to_average': {'type': 'int', 'value': 2},
 
+        # Staircase option variables
+        'starting_level': {'type': 'float', 'value': 30},
+        'min_level': {'type': 'float', 'value': -50},
+        'max_level': {'type': 'float', 'value': 90},
+        'step_sizes': {'type': 'str', 'value': "10, 5, 2"},
+        'num_reversals': {'type': 'int', 'value': 5},
+        'rapid_descend': {'type': 'str', 'value': 'Yes'},
+        
         # # Stimulus variables
         # 'audio_files_dir': {'type': 'str', 'value': 'Please select a folder'},
         # 'matrix_file_path': {'type': 'str', 'value': 'Please select a file'},

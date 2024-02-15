@@ -7,6 +7,7 @@
 # Import GUI packages
 import tkinter as tk
 from tkinter import ttk
+from idlelib.tooltip import Hovertip
 
 # Import audio packages
 import sounddevice as sd
@@ -70,10 +71,17 @@ class AudioDialog(tk.Toplevel):
         ###########
         # Widgets #
         ###########
+        tt_delay = 1000 #ms
+        
         # Routing
         # Label
-        ttk.Label(lfrm_routing, text="Output Speaker(s):").grid(
-            column=5, row=5, padx=5, pady=10, sticky='e')
+        lbl_routing = ttk.Label(lfrm_routing, text="Channels/Speakers:")
+        lbl_routing.grid(column=5, row=5, padx=5, pady=10, sticky='e')
+        routing_tt = Hovertip(
+            anchor_widget=lbl_routing,
+            text="Channel(s) over which to present audio.\nSeparate multiple channels with a space: 1 2 3.",
+            hover_delay=tt_delay
+        )
         self.routing_var = tk.StringVar(
             value=self.sessionpars['channel_routing'].get())
         # Entry
