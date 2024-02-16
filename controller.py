@@ -41,11 +41,11 @@ from models import csvmodel
 from models import stimulusmodel
 from models import staircase
 # Views
-from views import mainview_yes_no
+from views import mainview
 from views import sessionview
 from views import audioview
 from views import calibrationview
-from views import thresholdview
+from views import dataview
 # Images
 from app_assets import images
 # Help
@@ -118,7 +118,7 @@ class Application(tk.Tk):
         self.stim_dict = self.stim_model._create_stimulus_dict()
 
         # Load main view
-        self.main_frame = mainview_yes_no.MainFrame(self)
+        self.main_frame = mainview.MainFrame(self)
         self.main_frame.grid(row=5, column=5)
 
         # Add progress bar after loading mainview
@@ -313,6 +313,14 @@ class Application(tk.Tk):
         steps = self.sessionpars['step_sizes'].get()
         steps = [int(val) for val in steps.split(', ')]
 
+        # # Convert min/max values to digital level
+        # self.sessionpars['min_level'].set(
+        #     self._calc_level(self.sessionpars['min_level'].get())
+        # )
+        # self.sessionpars['max_level'].set(
+        #     self._calc_level(self.sessionpars['max_level'].get())
+        # )
+
         # Create staircase
         self.staircase = staircase.Staircase(
             start_val=self.sessionpars['desired_level_dB'].get(),
@@ -387,36 +395,30 @@ class Application(tk.Tk):
         
         # Interval 1
         self.main_frame.interval_1_colors()
-        #self.update_idletasks()
         if self.stim_interval == 1:
             self.present_audio(
                 audio=wt,
                 pres_level=self.sessionpars['adjusted_level_dB'].get(),
                 sampling_rate=self.FS
             )
-            #sd.play(wt, self.FS)
         time.sleep(self.sessionpars['duration'].get() + 0.15)
 
         # ISI
         self.main_frame.clear_interval_colors()
-        #self.update_idletasks()
         time.sleep(0.5)
 
         # Interval 2
         self.main_frame.interval_2_colors()
-        #self.update_idletasks()
         if self.stim_interval == 2:
             self.present_audio(
                 audio=wt,
                 pres_level=self.sessionpars['adjusted_level_dB'].get(),
                 sampling_rate=self.FS
             )
-            #sd.play(wt, self.FS)
-        time.sleep(self.sessionpars['duration'].get() + 0.15) # 1.15
+        time.sleep(self.sessionpars['duration'].get() + 0.15)
 
         # End
         self.main_frame.clear_interval_colors()
-        #self.update_idletasks()
 
 
     ########################
@@ -525,7 +527,9 @@ class Application(tk.Tk):
         """ Show session parameter dialog
         """
         print("\ncontroller: Calling session dialog...")
+        self.update_idletasks()
         sessionview.SessionDialog(self, self.sessionpars)
+        #self.sv = sessionview.SessionDialog(self, self.sessionpars)
 
 
     def _load_sessionpars(self):
@@ -560,15 +564,13 @@ class Application(tk.Tk):
     # Tools Menu Functions #
     ########################
     def _show_audio_dialog(self):
-        """ Show audio settings dialog
-        """
-        print("\ncontroller: Calling audio dialog...")
+        """ Show audio settings dialog. """
+        print("\ncontroller: Calling audio dialog")
         audioview.AudioDialog(self, self.sessionpars)
 
     def _show_calibration_dialog(self):
-        """ Display the calibration dialog window
-        """
-        print("\ncontroller: Calling calibration dialog...")
+        """ Display the calibration dialog window. """
+        print("\ncontroller: Calling calibration dialog")
         calibrationview.CalibrationDialog(self, self.sessionpars)
 
 
@@ -577,7 +579,7 @@ class Application(tk.Tk):
     #######################
     def show_scoring_dialog(self):
         print("\ncontroller: Calling threshold dialog")
-        thresholdview.ThresholdDialog(self)
+        dataview.ThresholdDialog(self)
 
 
     ################################

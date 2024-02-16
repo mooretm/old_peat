@@ -174,15 +174,20 @@ class AudioDialog(tk.Toplevel):
     # General Funcs #
     #################
     def center_window(self):
-        """ Center the root window 
-        """
+        """ Center the TopLevel window over the root window. """
+        # Get updated window size (after drawing widgets)
         self.update_idletasks()
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        size = tuple(int(_) for _ in self.geometry().split('+')[0].split('x'))
-        x = screen_width/2 - size[0]/2
-        y = screen_height/2 - size[1]/2
+
+        # Calculate the x and y coordinates to center the window
+        x = self.parent.winfo_x() \
+            + (self.parent.winfo_width() - self.winfo_reqwidth()) // 2
+        y = self.parent.winfo_y() \
+            + (self.parent.winfo_height() - self.winfo_reqheight()) // 2
+
+        # Set the window position
         self.geometry("+%d+%d" % (x, y))
+
+        # Display window
         self.deiconify()
 
 

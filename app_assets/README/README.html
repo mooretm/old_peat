@@ -56,7 +56,7 @@
 <p>NOTE: Written in lay language, so wording is not scientifically accurate (e.g., use of the word "pitch" instead of "frequency").</p>
 <p>The point of this task is to estimate the softest sounds you can hear, using a range of low-pitch to high-pitch sounds. The task consists of listening to two brief intervals of time, one after the other. You will know which interval is playing by watching the boxes on the screen in front of you. The empty box below the number 1 will turn blue while interval 1 plays (and go back to clear when interval 1 is over). Immediately following interval 1, interval 2 will play and its box will turn blue. When interval 2 is done playing, the box will return to clear. </p>
 <p>There are two things that make the task a little tricky: 1. only one interval will contain a sound (the other interval will only contain silence), and 2. the sounds will get softer and softer over time. Your job is to choose the interval that contained the sound. Please make your selection by pressing either the "1" key (for interval 1) or the "2" key (for interval 2). It seems easy, but can get difficult near your threshold (the softest sound you can hear). If you do not hear a sound in either interval, simply guess. </p>
-<p>You will see a message appear after each threshold is completed to allow you time for breaks. You can monitor your progress through the entire session by looking at the progress bar at the bottom of the screen. It will update based on the number of sounds left to test. 
+<p>You will see a message appear after each threshold is completed to allow you time for breaks. You can also monitor your progress through the entire session by looking at the progress bar at the bottom of the screen; it will update based on the number of sounds left to test. 
 <br>
 <br></p>
 <hr />
@@ -114,10 +114,13 @@
 <p><b>Device Selection.</b> The <code>Audio Settings</code> window displays available audio devices in a table (lower part of image). Simply click to choose the desired device. Your selection will be highlighted in blue and displayed in the <code>Audio Device</code> section of the <code>Channel Routing</code> group. </p>
 <h2>Tools&gt;Calibration</h2>
 <p>The Calibration window (below) provides a simple way to calibrate your stimuli using a sound level meter (SLM). </p>
+<p>NOTE: Calibration files are imported without any scaling applied. In essence, "dB FS" is simply however the system is set, and the original level of the recording. </p>
 <p><img src="calibration.png" alt="Calibration Window" width="400"/></p>
-<p><b>Calibration Stimulus.</b> You can choose to use the built-in white noise, or provide a custom file for the calibration signal (top group in image).</p>
-<p><b>Playback Controls.</b> Use the <code>Level (dB)</code> entry box to adjust the playback level in dB FS (middle group in image). The <code>Play</code> and <code>Stop</code> buttons allow you to start and stop the audio playback.</p>
-<p><b>Measured Level.</b> Use an SLM to measure the level of the calibration signal and enter the value into the <code>SLM Reading (dB)</code> entry box (bottom group in image). Click submit, and the application will calculate an offset so that you can specify presentation levels in dB (whichever type of dB you set the SLM to when measuring). Note that the <code>Submit</code> button is disabled until you click the <code>Play</code> button.
+<p><b>Calibration Stimulus.</b> You can choose to use the built-in white noise, or provide a custom file for the calibration signal (top group in image). If a multi-channel custom calibration file is provided, ensure the correct number of channels have been assigned in <code>Tools&gt;Audio Settings</code>. </p>
+<p><b>Playback Controls.</b> Use the <code>Level (dB)</code> entry box to adjust the digital playback level in dB (middle group in image). Adjust the level until the SLM reads above the noise floor of the room. The <code>Play</code> and <code>Stop</code> buttons allow you to start and stop the audio playback.</p>
+<p><b>Measured Level.</b> Use an SLM to measure the level of the calibration signal and enter the value into the <code>SLM Reading (dB)</code> entry box (bottom group in image). Click submit, and the application will calculate an offset so that you can specify presentation levels in dB (whichever type of dB you set the SLM to when measuring). </p>
+<p>NOTE: For multi-channel files, the SLM offset is applied to each channel individually. </p>
+<p>NOTE: The <code>Submit</code> button is disabled until you click the <code>Play</code> button.
 <br>
 <br></p>
 <hr />

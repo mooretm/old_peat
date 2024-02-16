@@ -57,7 +57,7 @@ The point of this task is to estimate the softest sounds you can hear, using a r
 
 There are two things that make the task a little tricky: 1. only one interval will contain a sound (the other interval will only contain silence), and 2. the sounds will get softer and softer over time. Your job is to choose the interval that contained the sound. Please make your selection by pressing either the "1" key (for interval 1) or the "2" key (for interval 2). It seems easy, but can get difficult near your threshold (the softest sound you can hear). If you do not hear a sound in either interval, simply guess. 
 
-You will see a message appear after each threshold is completed to allow you time for breaks. You can also monitor your progress through the entire session by looking at the progress bar at the bottom of the screen. It will update based on the number of sounds left to test. 
+You will see a message appear after each threshold is completed to allow you time for breaks. You can also monitor your progress through the entire session by looking at the progress bar at the bottom of the screen; it will update based on the number of sounds left to test. 
 <br>
 <br>
 
@@ -150,13 +150,19 @@ The ```Audio Settings``` window (below) allows you to select an audio device and
 ## Tools>Calibration
 The Calibration window (below) provides a simple way to calibrate your stimuli using a sound level meter (SLM). 
 
+NOTE: Calibration files are imported without any scaling applied. In essence, "dB FS" is simply however the system is set, and the original level of the recording. 
+
 <img src="calibration.png" alt="Calibration Window" width="400"/>
 
-<b>Calibration Stimulus.</b> You can choose to use the built-in white noise, or provide a custom file for the calibration signal (top group in image).
+<b>Calibration Stimulus.</b> You can choose to use the built-in white noise, or provide a custom file for the calibration signal (top group in image). If a multi-channel custom calibration file is provided, ensure the correct number of channels have been assigned in ```Tools>Audio Settings```. 
 
-<b>Playback Controls.</b> Use the ```Level (dB)``` entry box to adjust the playback level in dB FS (middle group in image). The ```Play``` and ```Stop``` buttons allow you to start and stop the audio playback.
+<b>Playback Controls.</b> Use the ```Level (dB)``` entry box to adjust the digital playback level in dB (middle group in image). Adjust the level until the SLM reads above the noise floor of the room. The ```Play``` and ```Stop``` buttons allow you to start and stop the audio playback.
 
-<b>Measured Level.</b> Use an SLM to measure the level of the calibration signal and enter the value into the ```SLM Reading (dB)``` entry box (bottom group in image). Click submit, and the application will calculate an offset so that you can specify presentation levels in dB (whichever type of dB you set the SLM to when measuring). Note that the ```Submit``` button is disabled until you click the ```Play``` button.
+<b>Measured Level.</b> Use an SLM to measure the level of the calibration signal and enter the value into the ```SLM Reading (dB)``` entry box (bottom group in image). Click submit, and the application will calculate an offset so that you can specify presentation levels in dB (whichever type of dB you set the SLM to when measuring). 
+
+NOTE: For multi-channel files, the SLM offset is applied to each channel individually. 
+
+NOTE: The ```Submit``` button is disabled until you click the ```Play``` button.
 <br>
 <br>
 
