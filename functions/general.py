@@ -71,10 +71,8 @@ def warble_tone(dur, fs, fc, mod_rate, mod_depth):
     # Create time vector
     t = np.arange(0, dur, 1/fs)
 
-    # Grab random phase value in degrees
+    # Get phase in radians from random value in degrees
     phi_rad = np.radians(np.random.randint(0, 179))
-    #print(f"\ngeneral: Phase: {phi_rad}")
-
 
     # Synthesize warble tone
     wc = fc * 2 * np.pi
@@ -82,6 +80,18 @@ def warble_tone(dur, fs, fc, mod_rate, mod_depth):
     B = (mod_depth / 100) * wc # in radians
     #y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - (np.pi/2)) + 1))
     y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - phi_rad) + 1))
+
+    # Play the audio using sounddevice
+    #sd.play(y, fs)
+
+    # # Plot spectrogram of y
+    # plt.figure()
+    # f, t, Sxx = spectrogram(y, fs, nperseg=1024)
+    # plt.pcolormesh(t, f, 10 * np.log10(Sxx))
+    # plt.title('Spectrogram')
+    # plt.xlabel('Time (s)')
+    # plt.ylabel('Frequency (Hz)')
+    # plt.show()
 
     return y
 
@@ -156,3 +166,43 @@ def string_to_list(string):
     """
     my_list = [int(val) for val in string.split(', ')]
     return my_list
+
+# RETSPL levels for binaural listening in a sound field,
+# in a diffuse field. From ANSI S3.6 (Table 9a). 
+# 
+RETSPL = {
+    20: 78.1, 
+    25: 68.7,
+    31.5: 59.5,
+    40: 51.1,
+    50: 44,
+    63: 37.5,
+    80: 31.5,
+    100: 26.5,
+    125: 22.1,
+    160: 17.9,
+    200: 14.4,
+    250: 11.4,
+    315: 8.4,
+    400: 5.8,
+    500: 3.8,
+    630: 2.1,
+    750: 1.2,
+    800: 1,
+    1000: 0.8,
+    1250: 1.9,
+    1500: 1,
+    1600: 0.5,
+    2000: -1.5,
+    2500: -3.1,
+    3000: -4,
+    4000: -3.8,
+    6000: 1.4,
+    6300: 2.5,
+    8000: 6.8,
+    9000: 8.4,
+    10000: 9.8,
+    11200: 11.5,
+    14000: 23.2,
+    16000: 43.7
+}
