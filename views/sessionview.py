@@ -218,12 +218,6 @@ class SessionDialog(tk.Toplevel):
             state='readonly'
         ).grid(row=30, column=10, sticky='w')
 
-        # Number of Presentations
-        # ttk.Label(frm_stimulus, text="Presentations:"
-        #     ).grid(row=30, column=5, sticky='e', **widget_options)
-        # ttk.Entry(frm_stimulus, width=20, 
-        #     textvariable=self.sessionpars['presentations']
-        #     ).grid(row=30, column=10, sticky='w')
 
         # # Randomize
         # #self.random_var = tk.IntVar(value=self.sessionpars['randomize'])
@@ -335,8 +329,11 @@ class SessionDialog(tk.Toplevel):
         """ Check number of presentations != 0.
             Send submit event to controller.
         """
-        # Make sure the number of presentations isn't 0
-        #self._check_presentations()
+        # Convert rapid descend response to boolean
+        if self.sessionpars['rapid_descend'].get() == "Yes":
+            self.sessionpars['rapid_descend_bool'].set(True)
+        elif self.sessionpars['rapid_descend'].get() == "No":
+            self.sessionpars['rapid_descend_bool'].set(False)
 
         # Make sure the number of reversals at least matches
         # the number of steps

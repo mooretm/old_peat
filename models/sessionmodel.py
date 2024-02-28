@@ -41,6 +41,7 @@ class SessionParsModel:
         'step_sizes': {'type': 'str', 'value': "10, 5, 2"},
         'num_reversals': {'type': 'int', 'value': 5},
         'rapid_descend': {'type': 'str', 'value': 'Yes'},
+        'rapid_descend_bool': {'type': 'bool', 'value': True},
         
         # # Stimulus variables
         # 'audio_files_dir': {'type': 'str', 'value': 'Please select a folder'},

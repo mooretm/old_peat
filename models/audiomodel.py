@@ -226,7 +226,7 @@ class Audio:
             # Convert level in dB to magnitude
             mag = self.db2mag(self.level)
             print(f"audiomodel: Adjusted Level (dB): {self.level}")
-            print(f"audiomodel: Multiplying signal by: {np.round(mag,8)}")
+            print(f"audiomodel: Multiplying signal by: {np.round(mag,8)}")    
             # Apply scaling factor to self.temp
             self.temp = self.temp * mag
 

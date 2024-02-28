@@ -13,10 +13,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
-# Data Science
-import random
-import numpy as np
-
 # System
 from pathlib import Path
 import time
@@ -66,7 +62,7 @@ class Application(tk.Tk):
         #############
         self.NAME = 'P.E.A.T.'
         self.VERSION = '1.0.0'
-        self.EDITED = 'February 15, 2024'
+        self.EDITED = 'February 28, 2024'
 
         # Create menu settings dictionary
         self._app_info = {
@@ -99,6 +95,7 @@ class Application(tk.Tk):
         # First trial flag
         self._first_run_flag = True
 
+        # Trial number tracker
         self.trial = 0
 
         # Load current session parameters from file
@@ -115,7 +112,7 @@ class Application(tk.Tk):
 
         # Load stimulus model
         self.stim_model = stimulusmodel.StimulusModel(self.sessionpars)
-        self.stim_dict = self.stim_model._create_stimulus_dict()
+        #self.stim_dict = self.stim_model._create_stimulus_dict()
 
         # Load main view
         self.main_frame = mainview.MainFrame(self)
@@ -169,7 +166,6 @@ class Application(tk.Tk):
 
         """ Temporarily disable help menu until ready. """
         #self.menu.help_menu.entryconfig('README...', state='disabled')
-
 
         # Center main window
         self.center_window()
@@ -227,12 +223,6 @@ class Application(tk.Tk):
         self.deiconify()
 
 
-    def _assign_stimulus_interval(self):
-        """ Randomly assign stimulus to an interval. """
-        stim_interval = random.sample(self.INTERVALS, 1)
-        return stim_interval[0]
-
-
     def _progress_bar(self):
         self.progress_bar = ttk.Progressbar(
             master=self,
@@ -259,18 +249,16 @@ class Application(tk.Tk):
             Create staircase.
             Present first trial.
         """
-        # Check for first time
+        # Check for first run
         if self._first_run_flag:
             # Disable "Start Task" from File menu
             self.menu.file_menu.entryconfig('Start Task', state='disabled')
 
-            # Get number of frequencies
-            # Query AFTER the task has begun to capture updates to sessioninfo
-            freqs = self.sessionpars['test_freqs'].get()
-            self.FREQS = [int(val) for val in freqs.split(', ')]
-            self.freqs = self.FREQS
-            self.NUM_FREQS = len(self.FREQS)
+            # Get frequencies
+            # Query AFTER the task starts to capture updates to sessioninfo
+            self.freqs, self.NUM_FREQS = self.stim_model.get_test_freqs()
 
+            # Set first run flag to False
             self._first_run_flag = False
             
         # Get next frequency or end
@@ -291,45 +279,36 @@ class Application(tk.Tk):
             self._quit()
             return
 
-        # Bind keys to main_frame response functions
-        self.bind('1', lambda event: self.main_frame._on_1())
-        self.bind('2', lambda event: self.main_frame._on_2())
+        # Generate stimulus
+        self.stim = self.stim_model.create_stimulus(
+            dur=self.sessionpars['duration'].get(),
+            fs=self.FS,
+            fc=self.current_freq,
+            mod_rate=5,
+            mod_depth=5
+        )
 
         # Update progress bar
         if self.progress_bar['value'] < 100:
             self.progress_bar['value'] += 100/self.NUM_FREQS
 
-        # Correct dB value using SLM offset
-        self._calc_level(self.sessionpars['starting_level'].get())
-
-        # Convert rapid descend to boolean
-        rd = self.sessionpars['rapid_descend'].get()
-        if rd == "Yes":
-            rd = True
-        elif rd == "No":
-            rd = False
-
         # Convert step_sizes to list of ints
         steps = self.sessionpars['step_sizes'].get()
         steps = [int(val) for val in steps.split(', ')]
 
-        # # Convert min/max values to digital level
-        # self.sessionpars['min_level'].set(
-        #     self._calc_level(self.sessionpars['min_level'].get())
-        # )
-        # self.sessionpars['max_level'].set(
-        #     self._calc_level(self.sessionpars['max_level'].get())
-        # )
+        # Correct dB value using SLM offset
+        #self._calc_level(self.sessionpars['starting_level'].get())
 
         # Create staircase
         self.staircase = staircase.Staircase(
-            start_val=self.sessionpars['desired_level_dB'].get(),
+            #start_val=self.sessionpars['desired_level_dB'].get(),
+            start_val=self.sessionpars['starting_level'].get(),
             step_sizes=steps,
             nUp=1,
             nDown=2,
             nTrials=0,
             nReversals=self.sessionpars['num_reversals'].get(),
-            rapid_descend=rd,
+            rapid_descend=self.sessionpars['rapid_descend_bool'].get(),
             min_val=self.sessionpars['min_level'].get(),
             max_val=self.sessionpars['max_level'].get()
         )
@@ -338,28 +317,16 @@ class Application(tk.Tk):
         self._new_trial()
 
 
-    def _create_stimulus(self):
-        stim_chans = self.sessionpars['num_stim_chans'].get()
+    def bind_keys(self):
+        # Bind keys to main_frame response functions
+        self.bind('1', lambda event: self.main_frame.on_1())
+        self.bind('2', lambda event: self.main_frame.on_2())
 
-        # List to hold each warble tone
-        sig_list = []
-        for ii in range(0,stim_chans):
-            # Generate warble tone based on current freq
-            wt = general.warble_tone(
-                dur=self.sessionpars['duration'].get(),
-                fs=self.FS, 
-                fc=self.current_freq,
-                mod_rate=5,
-                mod_depth=5
-            )
-            # Apply gating
-            wt = general.doGate(wt, rampdur=0.04, fs=self.FS)
-            sig_list.append(np.array(wt))
 
-        sig_list = np.array(sig_list).T
-        print(f"\ncontroller: signal shape: {sig_list.shape}")
-
-        return sig_list
+    def unbind_keys(self):
+        # Bind keys to main_frame response functions
+        self.unbind('1')
+        self.unbind('2')
 
 
     def _new_trial(self):
@@ -371,24 +338,35 @@ class Application(tk.Tk):
         print('*' * 60)
 
         # Assign stimulus to an interval
-        self.stim_interval = self._assign_stimulus_interval()
+        self.stim_interval = self.stim_model.assign_stimulus_interval(
+            intervals=self.INTERVALS
+        )
         print(f"controller: Stimulus is in interval {self.stim_interval}")
 
-        # Generate stimulus
-        wt = self._create_stimulus()
+        # # Generate stimulus
+        # wt = self.stim_model.create_stimulus(
+        #     dur=self.sessionpars['duration'].get(),
+        #     fs=self.FS,
+        #     fc=self.current_freq,
+        #     mod_rate=5,
+        #     mod_depth=5
+        # )
 
-        # # Plot first two cycles to illustrate random starting phase
-        # period = 1/self.current_freq
-        # samps = int(period * self.FS)
-        # samps = samps * 2
-        # for chan in range(0, wt.shape[1]):
-        #     plt.plot(wt[:samps, chan])
-        #     plt.show()
-        #     plt.close()
+        # Calculate the RETSPL-adjusted, single channel level
+        final_single_chan_level = self.stim_model.calc_presentation_lvl(
+            stair_lvl=self.staircase.current_level,
+            freq = self.current_freq
+        )
 
         # Apply offset to desired dB level
         # (Also update sessionpars)
-        self._calc_level(self.staircase.current_level)
+        self._calc_level(final_single_chan_level)
+
+        # Print values to console
+        print(f"Staircase level: {self.staircase.current_level}")
+        print(f"Unscaled final single chan level: {final_single_chan_level}")
+        print(f"Scaled final single chan level: " +
+              f"{self.sessionpars['adjusted_level_dB'].get()}")
 
         # Pause
         time.sleep(0.5)
@@ -397,7 +375,7 @@ class Application(tk.Tk):
         self.main_frame.interval_1_colors()
         if self.stim_interval == 1:
             self.present_audio(
-                audio=wt,
+                audio=self.stim,
                 pres_level=self.sessionpars['adjusted_level_dB'].get(),
                 sampling_rate=self.FS
             )
@@ -411,7 +389,7 @@ class Application(tk.Tk):
         self.main_frame.interval_2_colors()
         if self.stim_interval == 2:
             self.present_audio(
-                audio=wt,
+                audio=self.stim,
                 pres_level=self.sessionpars['adjusted_level_dB'].get(),
                 sampling_rate=self.FS
             )
@@ -419,6 +397,10 @@ class Application(tk.Tk):
 
         # End
         self.main_frame.clear_interval_colors()
+
+        # Wait to bind keys until after trial has finished
+        #   to avoid multiple submissions during the presentation
+        self.after(50, lambda: self.bind_keys())
 
 
     ########################
@@ -453,6 +435,9 @@ class Application(tk.Tk):
 
         # Update trial counter
         self.trial += 1
+
+        # Unbind keys at the start of the next trial
+        self.unbind_keys()
 
         # Check for end of staircase
         if not self.staircase.status:
@@ -529,7 +514,6 @@ class Application(tk.Tk):
         print("\ncontroller: Calling session dialog...")
         self.update_idletasks()
         sessionview.SessionDialog(self, self.sessionpars)
-        #self.sv = sessionview.SessionDialog(self, self.sessionpars)
 
 
     def _load_sessionpars(self):
@@ -605,8 +589,7 @@ class Application(tk.Tk):
 
 
     def _calc_offset(self):
-        """ Calculate offset based on SLM reading.
-        """
+        """ Calculate offset based on SLM reading. """
         # Calculate new presentation level
         self.calmodel.calc_offset()
         # Save level - this must be called here!

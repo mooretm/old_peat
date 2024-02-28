@@ -9,6 +9,9 @@ import os
 
 # Data science
 import numpy as np
+import scipy.signal as s
+from matplotlib import pyplot as plt
+
 
 
 #########
@@ -49,7 +52,7 @@ def add_channels(data, reps):
     """ For creating """
 
 
-def warble_tone(dur, fs, fc, mod_rate, mod_depth):
+def warble_tone(dur, fs, fc, phi, mod_rate, mod_depth):
     """ Create a warble tone. 
 
         Parameters:
@@ -71,22 +74,20 @@ def warble_tone(dur, fs, fc, mod_rate, mod_depth):
     # Create time vector
     t = np.arange(0, dur, 1/fs)
 
-    # Get phase in radians from random value in degrees
-    phi_rad = np.radians(np.random.randint(0, 179))
+    # # Get phase in radians from random value in degrees
+    # phi_rad = np.radians(np.random.randint(0, 179))
 
     # Synthesize warble tone
     wc = fc * 2 * np.pi
     wd = mod_rate * 2 * np.pi
     B = (mod_depth / 100) * wc # in radians
-    #y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - (np.pi/2)) + 1))
-    y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - phi_rad) + 1))
-
-    # Play the audio using sounddevice
-    #sd.play(y, fs)
+    #y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - (np.pi/2)) + 1)) #static phi
+    #y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - phi_rad) + 1)) # rando phi
+    y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - phi) + 1))
 
     # # Plot spectrogram of y
     # plt.figure()
-    # f, t, Sxx = spectrogram(y, fs, nperseg=1024)
+    # f, t, Sxx = s.spectrogram(y, fs, nperseg=1024)
     # plt.pcolormesh(t, f, 10 * np.log10(Sxx))
     # plt.title('Spectrogram')
     # plt.xlabel('Time (s)')
@@ -167,9 +168,167 @@ def string_to_list(string):
     my_list = [int(val) for val in string.split(', ')]
     return my_list
 
+
+def deg2rad(deg):
+    """ 
+        Convert degrees to radians. Takes a single
+        value or a list of values.
+    """
+    try:
+        rads = [np.radians(x) for x in deg]
+        return rads
+    except:
+        rads = np.radians(deg)
+        return rads
+    
+
+def db2mag(db):
+    """ 
+        Convert decibels to magnitude. Takes a single
+        value or a list of values.
+    """
+    # Must use this form to handle negative db values!
+    try:
+        mag = [10**(x/20) for x in db]
+        return mag
+    except:
+        mag = 10**(db/20)
+        return mag
+
+
+def mag2db(mag):
+    """ 
+        Convert magnitude to decibels. Takes a single
+        value or a list of values.
+    """
+    try:
+        db = [20 * np.log10(x) for x in mag]
+        return db
+    except:
+        db = 20 * np.log10(mag)
+        return db
+
+
+def calc_RMS_based_on_sources(desired_SPL, num_sources):
+    """ Calculate the SPL needed per channel to sum to the
+        desired SPL.
+    """
+    # Convert SPL to intensity
+    power_single = 10**(desired_SPL/10)
+    # Calculate total intensity
+    power_total = power_single * num_sources
+    # Find the difference between the total power and a single channel
+    diff_power = power_total - power_single
+    # Calculate a correction factor by dividing the diff by the number of channels
+    cf_power = diff_power / num_sources
+    # Calculate the new power for a single channel
+    new_power_single = power_single - cf_power
+    # Convert single channel power to SPL
+    new_spl_level = 10 * np.log10(new_power_single)
+    return new_spl_level
+
+
+def rms(sig):
+    """ 
+        Calculate the root mean square of a signal. 
+        
+        NOTE: np.square will return invalid, negative 
+            results if the number excedes the bit 
+            depth. In these cases, convert to int64
+            EXAMPLE: sig = np.array(sig,dtype=int)
+
+        Written by: Travis M. Moore
+        Last edited: Feb. 3, 2020
+    """
+    theRMS = np.sqrt(np.mean(np.square(sig)))
+    return theRMS
+
+
+def setRMS(sig,amp,eq='n'):
+    """
+        Set RMS level of a 1-channel or 2-channel signal.
+    
+        SIG: a 1-channel or 2-channel signal
+        AMP: the desired amplitude to be applied to 
+            each channel. Note this will be the RMS 
+            per channel, not the total of both channels.
+        EQ: takes 'y' or 'n'. Whether or not to equalize 
+            the levels in a 2-channel signal. For example, 
+            a signal with an ILD would lose the ILD with 
+            EQ='y', so the default in 'n'.
+
+        EXAMPLE: 
+        Create a 2 channel signal
+        [t, tone1] = mkTone(200,0.1,30,48000)
+        [t, tone2] = mkTone(100,0.1,0,48000)
+        combo = np.array([tone1, tone2])
+        adjusted = setRMS(combo,-15)
+
+        Written by: Travis M. Moore
+        Created: Jan. 10, 2022
+        Last edited: May 17, 2022
+    """
+    if len(sig.shape) == 1:
+        rmsdb = mag2db(rms(sig))
+        refdb = amp
+        diffdb = np.abs(rmsdb - refdb)
+        if rmsdb > refdb:
+            sigAdj = sig / db2mag(diffdb)
+        elif rmsdb < refdb:
+            sigAdj = sig * db2mag(diffdb)
+        # Edit 5/17/22
+        # Added handling for when rmsdb == refdb
+        elif rmsdb == refdb:
+            sigAdj = sig
+        return sigAdj
+        
+    elif len(sig.shape) == 2:
+        rmsdbLeft = mag2db(rms(sig[0]))
+        rmsdbRight = mag2db(rms(sig[1]))
+
+        ILD = np.abs(rmsdbLeft - rmsdbRight) # get lvl diff
+
+        # Determine lvl advantage
+        if rmsdbLeft > rmsdbRight:
+            lvlAdv = 'left'
+            #print("Adv: %s" % lvlAdv)
+        elif rmsdbRight > rmsdbLeft:
+            lvlAdv = 'right'
+            #print("Adv: %s" % lvlAdv)
+        elif rmsdbLeft == rmsdbRight:
+            lvlAdv = None
+
+        #refdb = amp - 3 # apply half amp to each channel
+        refdb = amp
+        diffdbLeft = np.abs(rmsdbLeft - refdb)
+        diffdbRight = np.abs(rmsdbRight - refdb)
+
+        # Adjust left channel
+        if rmsdbLeft > refdb:
+            sigAdjLeft = sig[0] / db2mag(diffdbLeft)
+        elif rmsdbLeft < refdb:
+            sigAdjLeft = sig[0] * db2mag(diffdbLeft)
+        # Adjust right channel
+        if rmsdbRight > refdb:
+            sigAdjRight = sig[1] / db2mag(diffdbRight)
+        elif rmsdbRight < refdb:
+            sigAdjRight = sig[1] * db2mag(diffdbRight)
+
+        # If there is a lvl difference to maintain across channels
+        if eq == 'n':
+            if lvlAdv == 'left':
+                sigAdjLeft = sigAdjLeft * db2mag(ILD/2)
+                sigAdjRight = sigAdjRight / db2mag(ILD/2)
+            elif lvlAdv == 'right':
+                sigAdjLeft = sigAdjLeft / db2mag(ILD/2)
+                sigAdjRight = sigAdjRight * db2mag(ILD/2)
+
+        sigBothAdj = np.array([sigAdjLeft, sigAdjRight])
+        return sigBothAdj
+
+
 # RETSPL levels for binaural listening in a sound field,
 # in a diffuse field. From ANSI S3.6 (Table 9a). 
-# 
 RETSPL = {
     20: 78.1, 
     25: 68.7,

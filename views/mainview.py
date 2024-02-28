@@ -105,7 +105,6 @@ class MainFrame(ttk.Frame):
         self.btn_submit = ttk.Button(frm_submit, text="Submit", 
             style="Big.TButton", command=self._on_submit, takefocus=0, 
             state='disabled', 
-            #image=self.submit_button_icon, compound=tk.LEFT
             )
         self.btn_submit.grid(row=10, column=5)
 
@@ -113,14 +112,14 @@ class MainFrame(ttk.Frame):
     #############
     # Functions #
     #############
-    def _on_1(self):
+    def on_1(self):
         self.text_var.set("Your Response: 1")
         self.btn_submit.config(state='enabled')
         self.parent.bind('<Return>', lambda event: self._on_submit())
         self.event_generate('<<MainOne>>')
 
 
-    def _on_2(self):
+    def on_2(self):
         self.text_var.set("Your Response: 2")
         self.btn_submit.config(state='enabled')
         self.parent.bind('<Return>', lambda event: self._on_submit())
