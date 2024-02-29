@@ -334,7 +334,7 @@ class Application(tk.Tk):
 
 
     def _new_trial(self):
-        """ """
+        """ Present a 2IAFC trial. """
         # Print message to console
         self.msg = f"Trial {self.trial}: {self.current_freq} Hz"
         print('')
