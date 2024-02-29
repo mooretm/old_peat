@@ -1,4 +1,4 @@
-""" Tests for audiomodel. 
+""" Unit tests for audiomodel. 
 
     Written by: Travis M. Moore
     Created: September 14, 2023

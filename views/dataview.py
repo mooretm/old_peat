@@ -21,8 +21,10 @@ class ThresholdDialog(tk.Toplevel):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
+        # Assign variables
         self.parent = parent
 
+        # Window settings
         self.withdraw()
         self.resizable(False, False)
         self.title("Calculate Thresholds")
@@ -36,8 +38,7 @@ class ThresholdDialog(tk.Toplevel):
 
 
     def draw_widgets(self):
-        """ Populate the main view with all widgets
-        """
+        """ Populate the main view with all widgets. """
         #################
         # Create frames #
         #################      
@@ -66,13 +67,16 @@ class ThresholdDialog(tk.Toplevel):
         ttk.Label(lfrm_options, text="Threshold Data Directory:"
             ).grid(row=20, column=5, sticky='e', **widget_options)
         # Create textvariable
-        self.thresh_data_dir_var = tk.StringVar(value='Please select a directory')
+        self.thresh_data_dir_var = tk.StringVar(
+            value='Please select a directory'
+        )
         # Threshold data directory browse button
         ttk.Label(lfrm_options, textvariable=self.thresh_data_dir_var, 
             borderwidth=2, relief="solid", width=30
             ).grid(row=20, column=10, sticky='w', padx=(0,10))
-        ttk.Button(lfrm_options, text="Browse", command=self._create_scoring_class
-            ).grid(row=25, column=10, sticky='w', pady=(0, 10))
+        ttk.Button(lfrm_options, text="Browse", 
+                   command=self._create_scoring_class).grid(row=25, 
+                    column=10, sticky='w', pady=(0, 10))
         
         # Number of reversals entry box
         self.num_reversals_var = tk.IntVar(value=0)
@@ -111,16 +115,20 @@ class ThresholdDialog(tk.Toplevel):
 
 
     def _create_scoring_class(self):
+        """ Instantiate Scoring Model. """
         # Instantiate ScoringModel object
         self.s = scoringmodel.ScoringModel()
 
         # Retrieve and truncate threshold data directory path
-        short_thresh_data_path = general.truncate_path(self.s.directory,
-                                                       length=30)
+        short_thresh_data_path = general.truncate_path(
+            self.s.directory,
+            length=30
+        )
         self.thresh_data_dir_var.set(value=short_thresh_data_path)
 
 
     def _on_submit(self):
+        """ Calculate thresholds using scoringmodel. """
         try:
             self.s.score(self.num_reversals_var.get())
         except AttributeError:

@@ -1,5 +1,4 @@
-""" Main menu class
-"""
+""" Main menu class. """
 
 ###########
 # Imports #
@@ -16,8 +15,7 @@ from app_assets import images
 # Begin #
 #########
 class MainMenu(tk.Menu):
-    """ Main Menu
-    """
+    """ Main Menu. """
     # Find parent window and tell it to 
     # generate a callback sequence
     def _event(self, sequence):
@@ -28,8 +26,7 @@ class MainMenu(tk.Menu):
 
 
     def _bind_accelerators(self):
-        """ Bind shortcut keys to event triggers.
-        """
+        """ Bind shortcut keys to event triggers. """
         #self.bind_all('<space>', self._event('<<PlaybackStart>>'))
         #self.bind_all('<Control-c>', self._event('<<PlaybackStop>>'))
         self.bind_all('<Control-q>', self._event('<<FileQuit>>'))
@@ -184,7 +181,7 @@ class MainMenu(tk.Menu):
     ##################
     # HELP menu
     def show_about(self):
-        """ Show the about dialog """
+        """ Show the about dialog. """
         about_message = self._app_info['name']
         about_detail = (
             'Written by: Travis M. Moore\n' +

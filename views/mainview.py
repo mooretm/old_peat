@@ -113,6 +113,10 @@ class MainFrame(ttk.Frame):
     # Functions #
     #############
     def on_1(self):
+        """ Update GUI with response selection.
+            Bind SUBMIT button to ENTER key.
+            Send event to controller.
+        """
         self.text_var.set("Your Response: 1")
         self.btn_submit.config(state='enabled')
         self.parent.bind('<Return>', lambda event: self._on_submit())
@@ -120,6 +124,10 @@ class MainFrame(ttk.Frame):
 
 
     def on_2(self):
+        """ Update GUI with response selection.
+            Bind SUBMIT button to ENTER key.
+            Send event to controller.
+        """
         self.text_var.set("Your Response: 2")
         self.btn_submit.config(state='enabled')
         self.parent.bind('<Return>', lambda event: self._on_submit())
@@ -127,6 +135,9 @@ class MainFrame(ttk.Frame):
 
 
     def _on_submit(self):
+        """ Unbind/disable SUBMIT button.
+            Send even to controller.
+        """
         self.btn_submit.config(state='disabled')
         self.parent.unbind('<Return>')
         self.text_var.set("Your Response:")
@@ -134,26 +145,31 @@ class MainFrame(ttk.Frame):
 
 
     def interval_1_colors(self):
+        """ Set interval 1 box color to blue. """
         self.box1.config(bg='blue')
         self.box2.config(bg=self._default_color)
         self.update_idletasks()
 
 
     def interval_2_colors(self):
+        """ Set interval 2 box color to blue. """
         self.box1.config(bg=self._default_color)
         self.box2.configure(bg='blue')
         self.update_idletasks()
 
 
     def clear_interval_colors(self):
+        """ Set interval box colors to clear. """
         self.box1.config(bg=self._default_color)
         self.box2.config(bg=self._default_color)
         self.update_idletasks()
 
 
     def show_response(self, response):
+        """ Display response on GUI. """
         self.text_var.set(f"Your Response: {response}")
 
 
     def clear_response(self):
+        """ Reset GUI response display. """
         self.text_var.set("Your Response:")

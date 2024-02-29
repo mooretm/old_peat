@@ -13,9 +13,9 @@
 
     Written by: <b>Travis M. Moore</b>
     <br>
-    Latest version: <b>Version 1.0.0</b><br>
+    Latest version: <b>Version 2.0.0</b><br>
     Originally created: <b>January 04, 2024</b><br>
-    Last edited: <b>February 15, 2024</b><br><br>
+    Last edited: <b>February 29, 2024</b><br><br>
 </div>
 
 ---

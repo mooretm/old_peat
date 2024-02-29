@@ -1,13 +1,11 @@
-""" Class for creating stimuli and calculating presentation level.
-"""
+""" Class for creating stimuli and calculating presentation levels. """
 
 ###########
 # Imports #
 ###########
 # Data Science
 import numpy as np
-import pandas as pd
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
 # System
 import random
@@ -66,6 +64,7 @@ class StimulusModel:
 
 
     def get_test_freqs(self):
+        """ Create list of integer test frequencies. """
         freqs = self.sessionpars['test_freqs'].get()
         self.FREQS = [int(val) for val in freqs.split(', ')]
         self.freqs = self.FREQS
@@ -77,6 +76,7 @@ class StimulusModel:
     def assign_stimulus_interval(self, intervals):
         """ Randomly assign stimulus to an interval. """
         stim_interval = random.sample(intervals, 1)
+        
         return stim_interval[0]
 
 
@@ -84,7 +84,7 @@ class StimulusModel:
         """ Calculate the final presentation level based on:
                 1. Staircase level
                 2. RETSPL @ current frequency
-                3. Adjust for number of sound field channels
+                3. Number of sound field channels
         """
         # Get RETSPL and add to desired level
         my_level = stair_lvl
@@ -98,7 +98,7 @@ class StimulusModel:
             num_sources=self.sessionpars['num_stim_chans'].get()
         )
 
-        return multichan_lvl
+        return np.round(multichan_lvl, 2)
 
 
     def _get_random_phis(self):
@@ -108,16 +108,9 @@ class StimulusModel:
         # Get number of sources/channels
         stim_chans = self.sessionpars['num_stim_chans'].get()
         
-        # # Create range of phase values in degrees, 
-        # #   separated by at least 10 degs.
-        # degrees = range(0, 180, 10)
-        # # Remove 180
-        # degrees = [x for x in degrees if x != 180] 
-        # # Set random seed for reproducible random numbers
-        
         # List of possible starting phases that Daniel Smieja
         # vetted for me.
-        degrees = [0, 40, 80, 120, 150, -40, -80, -120, -150]
+        degrees = [0, 40, 80, 120, 140, -40, -80, -120, -140]
         # Create an independent random number rng
         rng = random.Random(217)
         # Get list of random phases in degrees
@@ -127,6 +120,11 @@ class StimulusModel:
 
 
     def create_stimulus(self, dur, fs, fc, mod_rate, mod_depth):
+        """ Synthesize n-channel gated warble tones with pseudo-random
+            starting phases. Scale to -40 dB.
+
+            Returns: N-channel warble tone (FM)
+        """
         # Get number of sources/channels
         stim_chans = self.sessionpars['num_stim_chans'].get()
 
@@ -163,27 +161,5 @@ class StimulusModel:
             sig_list.append(np.array(wt))
 
         sig_list = np.array(sig_list).T
-        #print(f"\ncontroller: signal shape: {sig_list.shape}")
-
-        #import soundfile as sf
-        #sf.write('1kHz_-40.wav', sig_list, 48000)
 
         return sig_list
-
-
-
-
-    # def _create_stimulus_dict(self):
-    #     test_freqs = self.sessionpars['test_freqs'].get()
-    #     test_freqs = general.string_to_list(test_freqs)
-
-    #     stim_dict = {}
-    #     for f in test_freqs:
-    #         stim_dict[f] = general.warble_tone(
-    #             dur=self.sessionpars['duration'].get(),
-    #             fs=48000,
-    #             fc=f,
-    #             mod_rate=5,
-    #             mod_depth=5
-    #         )
-    #     return stim_dict

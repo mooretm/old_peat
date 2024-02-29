@@ -1,5 +1,4 @@
-""" Unit tests for calmodel.
-"""
+""" Unit tests for calmodel. """
 
 ###########
 # Imports #

@@ -1,5 +1,4 @@
-""" Model for storing session parameters 
-"""
+""" Model for storing session parameters. """
 
 ###########
 # IMPORTS #
@@ -16,7 +15,7 @@ import json
 # BEGIN #
 #########
 class SessionParsModel:
-    # Define dictionary items
+    # Define shared dictionary items (class variable)
     fields = {
         # Session variables
         'subject': {'type': 'str', 'value': '999'},
@@ -27,12 +26,6 @@ class SessionParsModel:
         'num_stim_chans': {'type': 'int', 'value': 1},
         'test_freqs': {'type': 'str', 'value': "500, 1000, 2000, 4000"},
         'duration': {'type': 'float', 'value': 2},
-        #'stimulus_type': {'type': 'str', 'value': "Warble Tone"},
-        #'presentations': {'type': 'int', 'value': 1},
-        #'randomize': {'type': 'int', 'value': 0},
-        #'repetitions': {'type': 'int', 'value': 1},
-        #'big_step': {'type': 'int', 'value': 5},
-        #'small_step': {'type': 'int', 'value': 2},
 
         # Staircase option variables
         'starting_level': {'type': 'float', 'value': 30},
@@ -64,11 +57,15 @@ class SessionParsModel:
         # Version control variables
         'config_file_status': {'type': 'int', 'value': 0},
         'check_for_updates': {'type': 'str', 'value': 'yes'},
-        'version_lib_path': {'type': 'str', 'value': r'\\starfile\Public\Temp\MooreT\Custom Software\version_library.csv'},
+        'version_lib_path': {'type': 'str', 'value': 
+            r'\\starfile\Public\Temp\MooreT\Custom Software\version_library.csv'},
     }
 
 
     def __init__(self, _app_info):
+        """ Create config file and directory.
+            Load values if a config file already exists.
+        """
         # Assign variables
         self._app_info = _app_info
 
@@ -91,8 +88,7 @@ class SessionParsModel:
 
 
     def load(self):
-        """ Attempt to load session parameters from file
-        """
+        """ Attempt to load session parameters from file. """
         # If the file doesn't exist, abort
         print("\nsessionmodel: Checking for parameter file...")
         if not self.filepath.exists():
@@ -121,8 +117,7 @@ class SessionParsModel:
 
 
     def save(self):
-        """ Save current session parameters to file 
-        """
+        """ Save current session parameters to file. """
         # Write to JSON file
         #print("sessionmodel: Writing session pars from model to file...")
         with open(self.filepath, 'w') as fh:
@@ -130,8 +125,7 @@ class SessionParsModel:
 
 
     def set(self, key, value):
-        """ Set a variable value.
-        """
+        """ Set a variable value. """
         #print("sessionmodel: Setting sessionpars model " +
         #    "fields with running vals...")
         if (

@@ -1,4 +1,4 @@
-""" Tests for stimulusmodel """
+""" Unit tests for stimulusmodel. """
 
 ###########
 # Imports #

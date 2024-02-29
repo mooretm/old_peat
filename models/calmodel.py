@@ -4,9 +4,9 @@
     Written by: Travis M. Moore
 """
 
-############
-# IMPORTS  #
-############
+###########
+# Imports #
+###########
 # Import system packages
 import os
 
@@ -15,18 +15,16 @@ from app_assets import audio
 
 
 #########
-# MODEL #
+# Model #
 #########
 class CalModel:
-    """ Write provided dictionary to .csv
-    """
+    """ Write provided dictionary to CSV. """
     def __init__(self, sessionpars):
         self.sessionpars = sessionpars
 
 
     def get_cal_file(self):
-        """ Load specified calibration file
-        """
+        """ Load specified calibration file. """
         print("calmodel: Locating calibration file...")
         if self.sessionpars['cal_file'].get() == 'cal_stim.wav':
             self.cal_file = audio.CALSTIM_WAV
@@ -40,8 +38,7 @@ class CalModel:
 
 
     def calc_offset(self):
-        """ Calculate adjusted presentation level
-        """
+        """ Calculate SLM offset. """
         # Calculate SLM offset
         print("\ncalmodel: Calculating new presentation level...")
         slm_offset = self.sessionpars['slm_reading'].get() - self.sessionpars['cal_level_dB'].get()
@@ -58,7 +55,7 @@ class CalModel:
 
 
     def calc_level(self, desired_level_dB):
-        # Calculate presentation level
+        """ Calculate adjusted presentation level. """
         self.sessionpars['desired_level_dB'].set(desired_level_dB)
         scaled_level = desired_level_dB - self.sessionpars['slm_offset'].get()
         # Make sure scaled_level != 0

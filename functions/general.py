@@ -9,17 +9,15 @@ import os
 
 # Data science
 import numpy as np
-import scipy.signal as s
-from matplotlib import pyplot as plt
-
+#import scipy.signal as s
+#from matplotlib import pyplot as plt
 
 
 #########
 # Funcs #
 #########
 def resource_path(relative_path):
-    """ Create the absolute path to compiled resources
-    """
+    """ Create the absolute path to compiled resources. """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
@@ -30,14 +28,16 @@ def resource_path(relative_path):
 
 
 def truncate_path(long_path, **kwargs):
-    """ Truncate path (if necessary) and return 
-        shortened path for display
+    """ Truncate path (if necessary) and return shortened 
+        path for display.
     """
+    # Check for custom length argument
     if 'length' in kwargs:
         length = kwargs['length']
     else:
         length = 60
 
+    # Truncate path based on length
     if len(long_path) >= length:
         short = '...' + long_path[-(length-5):]
         return short
@@ -48,10 +48,6 @@ def truncate_path(long_path, **kwargs):
             return long_path
 
 
-def add_channels(data, reps):
-    """ For creating """
-
-
 def warble_tone(dur, fs, fc, phi, mod_rate, mod_depth):
     """ Create a warble tone. 
 
@@ -59,30 +55,27 @@ def warble_tone(dur, fs, fc, phi, mod_rate, mod_depth):
             dur: duration in seconds
             fs: sampling rate in Hz
             fc: center frequency of the warble tone
+            phi: starting phase in radians
             mod_rate: modulation rate in percent
             mod_depth: modulation depth in percent
 
         Returns: a single-channel warble tone
         
         Example:
-            warble = _warble_tone(3, 44100, 1000, 5, 5)
+            warble = _warble_tone(3, 44100, 1000, 0, 5, 5)
 
         Written by: Travis M. Moore
         Created: 12/01/2023
-        Last edited: 02/12/2024
+        Last edited: 02/29/2024
     """
     # Create time vector
     t = np.arange(0, dur, 1/fs)
-
-    # # Get phase in radians from random value in degrees
-    # phi_rad = np.radians(np.random.randint(0, 179))
 
     # Synthesize warble tone
     wc = fc * 2 * np.pi
     wd = mod_rate * 2 * np.pi
     B = (mod_depth / 100) * wc # in radians
     #y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - (np.pi/2)) + 1)) #static phi
-    #y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - phi_rad) + 1)) # rando phi
     y = np.sin(wc * t + (B/wd) * (np.sin(wd * t - phi) + 1))
 
     # # Plot spectrogram of y
@@ -98,8 +91,7 @@ def warble_tone(dur, fs, fc, phi, mod_rate, mod_depth):
 
 
 def doGate(sig, rampdur=0.02, fs=48000):
-    """
-        Apply rising and falling ramps to signal SIG, of 
+    """ Apply rising and falling ramps to signal SIG, of 
         duration RAMPDUR. Takes a 1-channel or 2-channel 
         signal. 
 
@@ -139,8 +131,7 @@ def doGate(sig, rampdur=0.02, fs=48000):
 
 
 def mkTone(freq, dur, phi=0, fs=48000):
-    """ 
-    Create a pure tone. Returns the signal 
+    """ Create a pure tone. Returns the signal 
         AND the time base. 
     
         FREQ: frequency in Hz
@@ -170,8 +161,7 @@ def string_to_list(string):
 
 
 def deg2rad(deg):
-    """ 
-        Convert degrees to radians. Takes a single
+    """ Convert degrees to radians. Takes a single
         value or a list of values.
     """
     try:
@@ -183,8 +173,7 @@ def deg2rad(deg):
     
 
 def db2mag(db):
-    """ 
-        Convert decibels to magnitude. Takes a single
+    """ Convert decibels to magnitude. Takes a single
         value or a list of values.
     """
     # Must use this form to handle negative db values!
@@ -197,8 +186,7 @@ def db2mag(db):
 
 
 def mag2db(mag):
-    """ 
-        Convert magnitude to decibels. Takes a single
+    """ Convert magnitude to decibels. Takes a single
         value or a list of values.
     """
     try:
@@ -225,14 +213,14 @@ def calc_RMS_based_on_sources(desired_SPL, num_sources):
     new_power_single = power_single - cf_power
     # Convert single channel power to SPL
     new_spl_level = 10 * np.log10(new_power_single)
+
     return new_spl_level
 
 
 def rms(sig):
-    """ 
-        Calculate the root mean square of a signal. 
+    """ Calculate the root mean square of a signal. 
         
-        NOTE: np.square will return invalid, negative 
+        NOTE: np.square will return invalid negative 
             results if the number excedes the bit 
             depth. In these cases, convert to int64
             EXAMPLE: sig = np.array(sig,dtype=int)
@@ -241,12 +229,12 @@ def rms(sig):
         Last edited: Feb. 3, 2020
     """
     theRMS = np.sqrt(np.mean(np.square(sig)))
+
     return theRMS
 
 
 def setRMS(sig,amp,eq='n'):
-    """
-        Set RMS level of a 1-channel or 2-channel signal.
+    """ Set RMS level of a 1-channel or 2-channel signal.
     
         SIG: a 1-channel or 2-channel signal
         AMP: the desired amplitude to be applied to 
@@ -325,43 +313,3 @@ def setRMS(sig,amp,eq='n'):
 
         sigBothAdj = np.array([sigAdjLeft, sigAdjRight])
         return sigBothAdj
-
-
-# RETSPL levels for binaural listening in a sound field,
-# in a diffuse field. From ANSI S3.6 (Table 9a). 
-RETSPL = {
-    20: 78.1, 
-    25: 68.7,
-    31.5: 59.5,
-    40: 51.1,
-    50: 44,
-    63: 37.5,
-    80: 31.5,
-    100: 26.5,
-    125: 22.1,
-    160: 17.9,
-    200: 14.4,
-    250: 11.4,
-    315: 8.4,
-    400: 5.8,
-    500: 3.8,
-    630: 2.1,
-    750: 1.2,
-    800: 1,
-    1000: 0.8,
-    1250: 1.9,
-    1500: 1,
-    1600: 0.5,
-    2000: -1.5,
-    2500: -3.1,
-    3000: -4,
-    4000: -3.8,
-    6000: 1.4,
-    6300: 2.5,
-    8000: 6.8,
-    9000: 8.4,
-    10000: 9.8,
-    11200: 11.5,
-    14000: 23.2,
-    16000: 43.7
-}

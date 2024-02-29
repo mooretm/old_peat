@@ -1,5 +1,4 @@
-""" Calibration dialog class
-"""
+""" Calibration dialog class. """
 
 ###########
 # Imports #
@@ -11,15 +10,13 @@ from tkinter import filedialog
 
 # Import custom modules
 from functions import general
-from app_assets import audio
 
 
 #########
 # BEGIN #
 #########
 class CalibrationDialog(tk.Toplevel):
-    """ Calibration dialog.
-    """
+    """ Calibration dialog. """
     def __init__(self, parent, sessionpars, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.parent = parent
@@ -46,8 +43,7 @@ class CalibrationDialog(tk.Toplevel):
 
 
     def _draw_widgets(self):
-        """ Draw widgets on mainview.
-        """
+        """ Draw widgets on mainview. """
         ##########
         # Frames #
         ##########
@@ -81,8 +77,9 @@ class CalibrationDialog(tk.Toplevel):
             **options_small)
 
         # Upload custom calibration stimulus
-        rad_custom = ttk.Radiobutton(lfrm_load, text="Custom File", takefocus=0,
-            variable=self.cal_var, value='custom', command=self._cal_type)
+        rad_custom = ttk.Radiobutton(lfrm_load, text="Custom File", 
+            takefocus=0, variable=self.cal_var, value='custom', 
+            command=self._cal_type)
         rad_custom.grid(column=5, row=1, columnspan=10, sticky='w', 
             **options_small)
 
@@ -150,7 +147,7 @@ class CalibrationDialog(tk.Toplevel):
         self.ent_slm = ttk.Entry(lfrm_slm, 
             textvariable=self.sessionpars['slm_reading'],
             width=6, state='disabled')
-        self.ent_slm.grid(column=10, row=15, sticky='w', **options_small)   
+        self.ent_slm.grid(column=10, row=15, sticky='w', **options_small)
 
         # Submit button
         self.btn_submit = ttk.Button(lfrm_slm, text="Submit", 
@@ -181,16 +178,14 @@ class CalibrationDialog(tk.Toplevel):
 
 
     def _set_custom_cntrls_status(self, state):
-        """ Enable or disable custom cal file controls
-        """
+        """ Enable or disable custom cal file controls. """
         self.lbl_calfile1.config(state=state)
         self.lbl_calfile2.config(state=state)
         self.btn_browse.config(state=state)
 
 
     def _cal_type(self):
-        """ Radio button functions for choosing cal type
-        """
+        """ Radio button functions for choosing cal type. """
         # Custom calibration file
         if self.cal_var.get() == 'custom':
             # Enable file browsing controls
@@ -207,8 +202,7 @@ class CalibrationDialog(tk.Toplevel):
 
 
     def _load_cal(self):
-        """ File dialog for custom calibration file
-        """
+        """ File dialog for custom calibration file. """
         self.sessionpars['cal_file'].set(filedialog.askopenfilename())
 
         short_path = general.truncate_path(
@@ -218,22 +212,19 @@ class CalibrationDialog(tk.Toplevel):
 
 
     def _on_play(self):
-        """ Send play event to controller
-        """
+        """ Send play event to controller. """
         self.parent.event_generate('<<CalPlay>>')
         self.btn_submit.config(state='enabled')
         self.ent_slm.config(state='enabled')
 
 
     def _on_stop(self):
-        """ Send stop event to controller.
-        """
+        """ Send stop event to controller. """
         self.parent.event_generate('<<CalStop>>')
 
 
     def _on_submit(self):
-        """ Send save event to controller
-        """
+        """ Send save event to controller. """
         print("\ncalibrationview: Sending save event to controller...")
         self.parent.event_generate('<<CalibrationSubmit>>')
         self.destroy()

@@ -43,7 +43,8 @@ class VersionChecker:
 
 
     def check_for_updates(self):
-        """ Check app version against latest available version from library.
+        """ Check app version against latest available version 
+            from library.
         """
         # Retrieve app record from library 
         bools = self.version_library['name']==self.app_name
@@ -72,8 +73,7 @@ class VersionChecker:
 
 
     def import_version_library(self, lib_path):
-        """ Load version library
-        """
+        """ Load version library. """
         # Download version library for crossreferencing
         try:
             self.version_library = pd.read_csv(lib_path)
