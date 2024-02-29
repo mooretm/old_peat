@@ -31,7 +31,8 @@ class InvalidRouting(Exception):
 
 
     def __str__(self):
-        return f'Audio Exception: Audio has {self.channels} channel(s), but routing of {self.routing}.'
+        return f'Audio Exception: Audio has {self.channels} channel(s), '\
+             f'but routing of {self.routing}.'
 
 
 class InvalidAudioType(Exception):
@@ -43,7 +44,8 @@ class InvalidAudioType(Exception):
 
 
     def __str__(self):
-        return f'Audio Exception: Audio of type {self.audio_type} is not a valid audio type.'
+        return f'Audio Exception: Audio of type {self.audio_type} is not '\
+            'a valid audio type.'
 
 
 class MissingSamplingRate(Exception):
@@ -54,4 +56,5 @@ class MissingSamplingRate(Exception):
 
 
     def __str__(self):
-        return f'Audio Exception: A sampling rate must be provided with numpy array signals.'
+        return f'Audio Exception: A sampling rate must be provided '\
+            'with numpy array signals.'

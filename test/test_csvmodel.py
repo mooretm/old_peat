@@ -1,4 +1,4 @@
-""" Tests for csvmodel. """
+""" Unit tests for csvmodel. """
 
 ###########
 # Imports #

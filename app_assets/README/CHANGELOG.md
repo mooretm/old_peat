@@ -2,6 +2,27 @@
 <h2 style="text-align: center;">(P.sychophysical E.stimation of A.uditory T.hresholds)</h2>
 ---
 
+## Version 2.0.0
+
+Date: February 29, 2024
+
+### Major Features
+1. Added RETSPLs to levels to achieve perceptually-balanced presentations across frequencies.
+2. Calculated appropriate "random" starting phases to avoid constructive/destructive interference as much as possible. 
+3. Fixed random seed when choosing permissible starting phase values to ensure consistency in test results across trials, frequencies, and sessions. 
+4. Moved stimulus generation to the start of each run, avoiding re-synthesizing on each trial to improve processing time. 
+
+### Minor Features
+1. Added new key binding/unbinding logic to avoid multiple responses during a single trial.
+2. Levels are now rounded to two decimal places so Excel doesn't give conversion warning.
+
+### Patches
+1. Refactored stimulus code. 
+<br>
+<br>
+
+---
+
 ## Version 1.0.0
 
 Date: February 15, 2024

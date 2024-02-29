@@ -1,6 +1,23 @@
 <h1 style="text-align: center;">Change Log: P.E.A.T.</h1>
 <h2 style="text-align: center;">(P.sychophysical E.stimation of A.uditory T.hresholds)</h2>
 <hr />
+<h2>Version 2.0.0</h2>
+<p>Date: February 29, 2024</p>
+<h3>Features</h3>
+<ol>
+<li>Added RETSPLs to levels to achieve perceptually-balanced presentations across frequencies.</li>
+<li>Calculated appropriate "random" starting phases to avoid constructive/destructive interference as much as possible. </li>
+<li>Fixed random seed when choosing permissible starting phase values to ensure consistency in test results across trials, frequencies, and sessions. </li>
+<li>Added new key binding/unbinding logic to avoid multiple responses during a single trial.</li>
+<li>Moved stimulus generation to the start of each run, avoiding re-synthesizing on each trial to improve processing time. </li>
+</ol>
+<h3>Patches</h3>
+<ol>
+<li>Refactored stimulus code. 
+<br>
+<br></li>
+</ol>
+<hr />
 <h2>Version 1.0.0</h2>
 <p>Date: February 15, 2024</p>
 <h3>Features</h3>

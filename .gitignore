@@ -6,4 +6,6 @@ Data/
 *.doc
 *.docx
 output/
+archive/
+sample.py
 venv/

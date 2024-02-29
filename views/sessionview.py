@@ -15,13 +15,15 @@ from idlelib.tooltip import Hovertip
 # BEGIN #
 #########
 class SessionDialog(tk.Toplevel):
-    """ Dialog for setting session parameters
-    """
+    """ Dialog for setting session parameters. """
     def __init__(self, parent, sessionpars, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
+
+        # Assign variables
         self.parent = parent
         self.sessionpars = sessionpars
 
+        # Window settings
         self.withdraw()
         self.resizable(False, False)
         self.title("Settings")
@@ -61,6 +63,7 @@ class SessionDialog(tk.Toplevel):
         ################
         # Draw Widgets #
         ################
+        # Default amount of time for tool tips to appear
         tt_delay = 1000 # ms
 
         # SESSION #
@@ -218,76 +221,6 @@ class SessionDialog(tk.Toplevel):
             state='readonly'
         ).grid(row=30, column=10, sticky='w')
 
-        # Number of Presentations
-        # ttk.Label(frm_stimulus, text="Presentations:"
-        #     ).grid(row=30, column=5, sticky='e', **widget_options)
-        # ttk.Entry(frm_stimulus, width=20, 
-        #     textvariable=self.sessionpars['presentations']
-        #     ).grid(row=30, column=10, sticky='w')
-
-        # # Randomize
-        # #self.random_var = tk.IntVar(value=self.sessionpars['randomize'])
-        # chk_random = ttk.Checkbutton(frm_stimulus, text="Randomize",
-        #     takefocus=0, variable=self.sessionpars['randomize'])
-        # chk_random.grid(row=5, column=5,  columnspan=20, sticky='w', 
-        #     **widget_options)
-
-        # # Repetitions
-        # ttk.Label(frm_stimulus, text="Presentation(s):"
-        #     ).grid(row=10, column=5, sticky='e', **widget_options)
-        # ttk.Entry(frm_stimulus, width=20, 
-        #     textvariable=self.sessionpars['repetitions']
-        #     ).grid(row=10, column=10, sticky='w')
-
-
-        # ###################
-        # # Audio Directory #
-        # ###################
-        # # Descriptive label
-        # ttk.Label(frm_audiopath, text="Path:"
-        #     ).grid(row=20, column=5, sticky='e', **widget_options)
-
-        # # Retrieve and truncate previous audio directory
-        # short_audio_path = general.truncate_path(
-        #     self.sessionpars['audio_files_dir'].get()
-        # )
-
-        # # Create textvariable
-        # self.audio_var = tk.StringVar(value=short_audio_path)
-
-        # # Audio directory label
-        # ttk.Label(frm_audiopath, textvariable=self.audio_var, 
-        #     borderwidth=2, relief="solid", width=60
-        #     ).grid(row=20, column=10, sticky='w')
-        # ttk.Button(frm_audiopath, text="Browse", 
-        #     command=self._get_audio_directory,
-        #     ).grid(row=25, column=10, sticky='w', pady=(0, 10))
-
-
-        # ####################
-        # # Matrix Directory #
-        # ####################
-        # # Descriptive label
-        # ttk.Label(frm_matrixpath, text="Path:"
-        #     ).grid(row=30, column=5, sticky='e', **widget_options)
-        
-        # # Retrieve and truncate existing audio directory
-        # short_matrix_path = general.truncate_path(
-        #     self.sessionpars['matrix_file_path'].get()
-        # )
-
-        # # Create textvariable
-        # self.matrix_var = tk.StringVar(value=short_matrix_path)
-
-        # # Matrix file label
-        # ttk.Label(frm_matrixpath, textvariable=self.matrix_var, 
-        #     borderwidth=2, relief="solid", width=60
-        #     ).grid(row=30, column=10, sticky='w')
-        # ttk.Button(frm_matrixpath, text="Browse", 
-        #     command=self._get_matrix_file).grid(row=35, column=10, 
-        #     sticky='w', pady=(0, 10))
-
-
         # Submit button
         btn_submit = ttk.Button(self, text="Submit", command=self._on_submit)
         btn_submit.grid(row=40, column=5, columnspan=2, pady=(0, 10))
@@ -318,6 +251,7 @@ class SessionDialog(tk.Toplevel):
 
 
     def _check_reversals(self):
+        """ Ensure there are enough reversals for step sizes. """
         revs = self.sessionpars['num_reversals'].get() 
         steps = int(len(self.sessionpars['step_sizes'].get().split()))
 
@@ -325,6 +259,7 @@ class SessionDialog(tk.Toplevel):
 
 
     def _check_levels(self):
+        """ Ensure minimum level is less than maximum level. """
         min_level = self.sessionpars['min_level'].get()
         max_level = self.sessionpars['max_level'].get()
 
@@ -332,14 +267,17 @@ class SessionDialog(tk.Toplevel):
 
 
     def _on_submit(self):
-        """ Check number of presentations != 0.
+        """ Perform various validation checks.
             Send submit event to controller.
         """
-        # Make sure the number of presentations isn't 0
-        #self._check_presentations()
+        # Convert rapid descend response to boolean
+        if self.sessionpars['rapid_descend'].get() == "Yes":
+            self.sessionpars['rapid_descend_bool'].set(True)
+        elif self.sessionpars['rapid_descend'].get() == "No":
+            self.sessionpars['rapid_descend_bool'].set(False)
 
         # Make sure the number of reversals at least matches
-        # the number of steps
+        #   the number of steps
         if not self._check_reversals():
             messagebox.showerror(
                 title="Not Enough Reversals",
@@ -358,39 +296,3 @@ class SessionDialog(tk.Toplevel):
         print("\nviews_sessiondialog: Sending save event...")
         self.parent.event_generate('<<SessionSubmit>>')
         self.destroy()
-
-    # def _get_audio_directory(self):
-    #     """ Get path to audio files
-    #     """
-    #     # Get directory from dialog
-    #     filename = filedialog.askdirectory(title="Audio File Directory")
-
-    #     # Update sessionpars with audio files dir
-    #     self.sessionpars['audio_files_dir'].set(filename)
-
-    #     # Update audio label
-    #     self.audio_var.set(general.truncate_path(filename))
-
-
-    # def _get_matrix_file(self):
-    #     """ Get path to matrix file
-    #     """
-    #     # Get file from dialog
-    #     filename = filedialog.askopenfilename(title="Matrix File", 
-    #         filetypes=[("CSV", "*.csv")])
-        
-    #     # Update sessionpars with matrix file path
-    #     self.sessionpars['matrix_file_path'].set(filename)
-
-    #     # Update matrix label
-    #     self.matrix_var.set(general.truncate_path(filename))
-
-
-    # def _check_presentations(self):
-    #     if self.sessionpars['repetitions'].get() == 0:
-    #         self.sessionpars['repetitions'].set(1)
-    #         messagebox.showwarning(title="Seriously?",
-    #             message="Invalid number of presentations!",
-    #             detail="You must have at least 1 round of presentations! " +
-    #                 "Updating to 1 presentation."
-    #         )

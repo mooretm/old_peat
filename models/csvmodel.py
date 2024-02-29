@@ -1,5 +1,4 @@
-""" Class to write data to CSV.
-"""
+""" Class to write trial data to CSV. """
 
 ############
 # IMPORTS  #
@@ -15,9 +14,13 @@ import os
 # MODEL #
 #########
 class CSVModel:
-    """ Write provided dictionary to .csv
-    """
+    """ Write provided dictionary to CSV. """
     def __init__(self, sessionpars, **kwargs):
+        """ Create datestamp for file name. 
+            Create data directory.
+        """
+
+        # Assign variables
         self.sessionpars = sessionpars
 
         # Generate date stamp
@@ -50,7 +53,7 @@ class CSVModel:
 
 
     def _check_write_access(self):
-        # Check for write access to store csv
+        """ Check for write access to store CSV. """
         file_exists = os.access(self.file, os.F_OK)
         parent_writable = os.access(self.file.parent, os.W_OK)
         file_writable = os.access(self.file, os.W_OK)

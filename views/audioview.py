@@ -1,5 +1,4 @@
-""" Audio device selection view
-"""
+""" Audio device dialog. """
 
 ###########
 # Imports #
@@ -17,10 +16,11 @@ import sounddevice as sd
 # BEGIN #
 #########
 class AudioDialog(tk.Toplevel):
-    """ Audio device dialog.
-    """
+    """ Audio device dialog. """
     def __init__(self, parent, sessionpars, *args, **kwargs):
         super().__init__(parent, *args, *kwargs)
+
+        # Assign variables
         self.parent = parent
         self.sessionpars = sessionpars
 
@@ -42,11 +42,15 @@ class AudioDialog(tk.Toplevel):
 
 
     def _draw_widgets(self):
+        """ Draw widgets to window. """
         #################
         # Custom Styles #
         #################
         self.style = ttk.Style()
-        self.style.configure('Bold.TLabel', font=('TKDefaultFont', 10, 'bold'))
+        self.style.configure(
+            'Bold.TLabel', 
+            font=('TKDefaultFont', 10, 'bold')
+        )
 
 
         ##########
@@ -79,7 +83,8 @@ class AudioDialog(tk.Toplevel):
         lbl_routing.grid(column=5, row=5, padx=5, pady=10, sticky='e')
         routing_tt = Hovertip(
             anchor_widget=lbl_routing,
-            text="Channel(s) over which to present audio.\nSeparate multiple channels with a space: 1 2 3.",
+            text="Channel(s) over which to present audio."\
+                + "\nSeparate multiple channels with a space: 1 2 3.",
             hover_delay=tt_delay
         )
         self.routing_var = tk.StringVar(
@@ -111,11 +116,10 @@ class AudioDialog(tk.Toplevel):
         
 
     def _get_audio_device_name(self):
-        """ Get the audio device name from the device ID.
-        """
+        """ Get the audio device name from the device ID. """
         try:
-            audio_device_name = [item[1] for item in self.devices if item[0] == \
-                                self.sessionpars['audio_device'].get()][0]
+            audio_device_name = [item[1] for item in self.devices if \
+                item[0] == self.sessionpars['audio_device'].get()][0]
         except IndexError:
             audio_device_name = "No audio device selected"
 
@@ -123,8 +127,7 @@ class AudioDialog(tk.Toplevel):
 
 
     def _create_tree_widget(self):
-        """ Create and populate treeview.
-        """
+        """ Create and populate treeview. """
         columns = ('device_id', 'device_name', 'channels_out')
         tree = ttk.Treeview(self.frm_tree, columns=columns, show='headings')
 
@@ -142,7 +145,8 @@ class AudioDialog(tk.Toplevel):
         tree.grid(row=10, column=5, sticky=tk.NSEW)
 
         # Add a scrollbar
-        scrollbar = ttk.Scrollbar(self.frm_tree, orient=tk.VERTICAL, command=tree.yview)
+        scrollbar = ttk.Scrollbar(self.frm_tree, orient=tk.VERTICAL, 
+            command=tree.yview)
         tree.configure(yscroll=scrollbar.set)
         scrollbar.grid(row=10, column=6, sticky='ns')
 
@@ -154,12 +158,11 @@ class AudioDialog(tk.Toplevel):
 
 
     def _query_audio_devices(self):
-        """ Create list of tuples with specified device information.
-        """
+        """ Create list of tuples with specified device information. """
         # Get list of audio devices
         deviceList = sd.query_devices()
-        print("\naudioview: Full audio device list:")
-        print(deviceList)
+        #print("\naudioview: Full audio device list:")
+        #print(deviceList)
 
         # Create list of tuples with device info
         devices = []
@@ -206,7 +209,9 @@ class AudioDialog(tk.Toplevel):
 
 
     def _on_submit(self):
-        """ Send submit event to controller.
+        """ Update channel routing.
+            Send submit event to controller. 
+            Close window.
         """
         print("\naudioview: Sending save audio device event...")
         self.sessionpars['channel_routing'].set(self.routing_var.get())

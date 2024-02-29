@@ -1,5 +1,4 @@
-""" Model to calculate thresholds from P.E.A.T.
-"""
+""" Model to calculate thresholds from P.E.A.T. """
 
 ###########
 # Imports #
@@ -18,6 +17,7 @@ import os
 
 class ScoringModel:
     def __init__(self):
+        """ Display system file browser and save data dir. """
         try:
             self.directory = filedialog.askdirectory()
         except KeyError:
@@ -27,6 +27,7 @@ class ScoringModel:
 
 
     def _organize_data(self):
+        """ Concatenate data from all CSVs in dir. """
         # Get all .csv file names from provided directory
         all_files = glob.glob(os.path.join(self.directory, "*.csv"))
 
@@ -54,6 +55,7 @@ class ScoringModel:
         
 
     def score(self, num_reversals):
+        """ Calculate thresholds and write to CSV. """
         # Validation
         if num_reversals <= 0:
             raise ValueError("Number of reversals cannot be 0 or negative!")
@@ -75,33 +77,3 @@ class ScoringModel:
         thresholds_df.to_csv('thresholds.csv', index=False)
 
         print(f"\nscoringmodel: Thresholds written to CSV successfully")
-
-
-    # def score(self, num_reversals):
-    #     # Validation
-    #     if num_reversals <= 0:
-    #         raise ValueError("Number of reversals cannot be 0 or negative!")
-        
-    #     # Calculate thresholds
-    #     thresholds = []
-    #     for sub in self.data['subject'].unique():
-    #         sub_data = self.data[self.data['subject']==sub].copy()
-    #         for freq in self.data['test_freq'].unique():
-    #             # Isolate the rows of interest
-    #             freq_mask = sub_data['test_freq'] == freq
-    #             temp = sub_data[freq_mask].copy()
-    #             reversal_mask = temp['reversal'] == True
-    #             temp = temp[reversal_mask]
-    #             temp.reset_index(drop=True, inplace=True)
-    #             print(temp)
-
-    #             # Calculate threshold and append to list
-    #             t = temp['desired_level_dB'][-num_reversals:].mean()
-    #             print(t)
-    #             thresholds.append((sub, freq, t,))
-
-    #     # Create dataframe from list of tuples
-    #     df = pd.DataFrame(thresholds, columns=['subject', 'freq', 'threshold'])
-    #     df.to_csv('thresholds.csv', index=False)
-
-    #     print(df)

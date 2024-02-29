@@ -1,5 +1,15 @@
-""" Field Attenuation Estimation System (FAES) for SoundGear 
-    NRR measuremetns. 
+""" P.sychophysical E.stimation of A.uditory T.hresholds (PEAT)
+    
+    Threshold estimation app for SoundGear NRR measurements. 
+    For use in the sound field, PEAT presents warble tones (FM)
+    to a given number of speakers. RETSPLs have been applied to
+    equal loudness. Starting phase and sound field summation of
+    the warble tones are accounted for. 
+
+    PEAT uses a 2IAFC task with a 1-up 2-down rule, tracking at 
+    the 70.7% correct level (Levitt, 1971). 
+    
+    Calibrate using a mono 1 kHz warble tone scaled to -40 dB. 
 
     Written by: Travis M. Moore
     Created: January 4, 2024
@@ -12,10 +22,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-
-# Data Science
-import random
-import numpy as np
 
 # System
 from pathlib import Path
@@ -30,8 +36,6 @@ import markdown
 from menus import mainmenu
 # Exceptions
 from exceptions import audio_exceptions
-# Function Library
-from functions import general
 # Models
 from models import sessionmodel
 from models import versionmodel
@@ -56,8 +60,7 @@ from app_assets import README
 # BEGIN #
 #########
 class Application(tk.Tk):
-    """ Application root window
-    """
+    """ Application root window. """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -65,8 +68,8 @@ class Application(tk.Tk):
         # Constants #
         #############
         self.NAME = 'P.E.A.T.'
-        self.VERSION = '1.0.0'
-        self.EDITED = 'February 15, 2024'
+        self.VERSION = '2.0.0'
+        self.EDITED = 'February 29, 2024'
 
         # Create menu settings dictionary
         self._app_info = {
@@ -99,6 +102,7 @@ class Application(tk.Tk):
         # First trial flag
         self._first_run_flag = True
 
+        # Trial number tracker
         self.trial = 0
 
         # Load current session parameters from file
@@ -115,7 +119,6 @@ class Application(tk.Tk):
 
         # Load stimulus model
         self.stim_model = stimulusmodel.StimulusModel(self.sessionpars)
-        self.stim_dict = self.stim_model._create_stimulus_dict()
 
         # Load main view
         self.main_frame = mainview.MainFrame(self)
@@ -170,7 +173,6 @@ class Application(tk.Tk):
         """ Temporarily disable help menu until ready. """
         #self.menu.help_menu.entryconfig('README...', state='disabled')
 
-
         # Center main window
         self.center_window()
 
@@ -215,8 +217,7 @@ class Application(tk.Tk):
     # General Functions #
     #####################
     def center_window(self):
-        """ Center the root window 
-        """
+        """ Center the root window. """
         self.update_idletasks()
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -227,13 +228,11 @@ class Application(tk.Tk):
         self.deiconify()
 
 
-    def _assign_stimulus_interval(self):
-        """ Randomly assign stimulus to an interval. """
-        stim_interval = random.sample(self.INTERVALS, 1)
-        return stim_interval[0]
-
-
     def _progress_bar(self):
+        """ Create and position task progress bar. The progress 
+            bar updates based on the number of frequencies 
+            remaining to test in a given session.
+        """
         self.progress_bar = ttk.Progressbar(
             master=self,
             orient='horizontal',
@@ -243,9 +242,20 @@ class Application(tk.Tk):
         self.progress_bar.grid(row=10, column=5, columnspan=40, sticky='nsew')
 
 
+    def bind_keys(self):
+        """ Bind keys to main_frame response functions. """
+        self.bind('1', lambda event: self.main_frame.on_1())
+        self.bind('2', lambda event: self.main_frame.on_2())
+
+
+    def unbind_keys(self):
+        """ Unbind keys to main_frame response functions. """
+        self.unbind('1')
+        self.unbind('2')
+
+
     def _quit(self):
-        """ Exit the application.
-        """
+        """ Exit the application. """
         self.destroy()
 
 
@@ -253,24 +263,22 @@ class Application(tk.Tk):
     # File Menu Funcs #
     ###################
     def start_new_run(self):
-        """ Disable "Start Task" from file menu.
-            Get number of frequencies to test (for progress bar).
-            Bind keys to response functions.
-            Create staircase.
-            Present first trial.
+        """ 1. Disable "Start Task" from file menu.
+            2. Get number of frequencies to test (for progress bar).
+            3. Create staircase.
+            4. Present first trial.
+            Repeat steps 2 - 4 for each new run (i.e., frequency).
         """
-        # Check for first time
+        # Check for first run
         if self._first_run_flag:
             # Disable "Start Task" from File menu
             self.menu.file_menu.entryconfig('Start Task', state='disabled')
 
-            # Get number of frequencies
-            # Query AFTER the task has begun to capture updates to sessioninfo
-            freqs = self.sessionpars['test_freqs'].get()
-            self.FREQS = [int(val) for val in freqs.split(', ')]
-            self.freqs = self.FREQS
-            self.NUM_FREQS = len(self.FREQS)
+            # Get frequencies
+            # Query AFTER the task starts to capture updates to sessioninfo
+            self.freqs, self.NUM_FREQS = self.stim_model.get_test_freqs()
 
+            # Set first run flag to False
             self._first_run_flag = False
             
         # Get next frequency or end
@@ -291,45 +299,32 @@ class Application(tk.Tk):
             self._quit()
             return
 
-        # Bind keys to main_frame response functions
-        self.bind('1', lambda event: self.main_frame._on_1())
-        self.bind('2', lambda event: self.main_frame._on_2())
+        # Generate stimulus
+        self.stim = self.stim_model.create_stimulus(
+            dur=self.sessionpars['duration'].get(),
+            fs=self.FS,
+            fc=self.current_freq,
+            mod_rate=5,
+            mod_depth=5
+        )
 
         # Update progress bar
         if self.progress_bar['value'] < 100:
             self.progress_bar['value'] += 100/self.NUM_FREQS
 
-        # Correct dB value using SLM offset
-        self._calc_level(self.sessionpars['starting_level'].get())
-
-        # Convert rapid descend to boolean
-        rd = self.sessionpars['rapid_descend'].get()
-        if rd == "Yes":
-            rd = True
-        elif rd == "No":
-            rd = False
-
         # Convert step_sizes to list of ints
         steps = self.sessionpars['step_sizes'].get()
         steps = [int(val) for val in steps.split(', ')]
 
-        # # Convert min/max values to digital level
-        # self.sessionpars['min_level'].set(
-        #     self._calc_level(self.sessionpars['min_level'].get())
-        # )
-        # self.sessionpars['max_level'].set(
-        #     self._calc_level(self.sessionpars['max_level'].get())
-        # )
-
         # Create staircase
         self.staircase = staircase.Staircase(
-            start_val=self.sessionpars['desired_level_dB'].get(),
+            start_val=self.sessionpars['starting_level'].get(),
             step_sizes=steps,
             nUp=1,
             nDown=2,
             nTrials=0,
             nReversals=self.sessionpars['num_reversals'].get(),
-            rapid_descend=rd,
+            rapid_descend=self.sessionpars['rapid_descend_bool'].get(),
             min_val=self.sessionpars['min_level'].get(),
             max_val=self.sessionpars['max_level'].get()
         )
@@ -338,31 +333,8 @@ class Application(tk.Tk):
         self._new_trial()
 
 
-    def _create_stimulus(self):
-        stim_chans = self.sessionpars['num_stim_chans'].get()
-
-        # List to hold each warble tone
-        sig_list = []
-        for ii in range(0,stim_chans):
-            # Generate warble tone based on current freq
-            wt = general.warble_tone(
-                dur=self.sessionpars['duration'].get(),
-                fs=self.FS, 
-                fc=self.current_freq,
-                mod_rate=5,
-                mod_depth=5
-            )
-            # Apply gating
-            wt = general.doGate(wt, rampdur=0.04, fs=self.FS)
-            sig_list.append(np.array(wt))
-
-        sig_list = np.array(sig_list).T
-        print(f"\ncontroller: signal shape: {sig_list.shape}")
-
-        return sig_list
-
-
     def _new_trial(self):
+        """ """
         # Print message to console
         self.msg = f"Trial {self.trial}: {self.current_freq} Hz"
         print('')
@@ -371,24 +343,26 @@ class Application(tk.Tk):
         print('*' * 60)
 
         # Assign stimulus to an interval
-        self.stim_interval = self._assign_stimulus_interval()
+        self.stim_interval = self.stim_model.assign_stimulus_interval(
+            intervals=self.INTERVALS
+        )
         print(f"controller: Stimulus is in interval {self.stim_interval}")
 
-        # Generate stimulus
-        wt = self._create_stimulus()
-
-        # # Plot first two cycles to illustrate random starting phase
-        # period = 1/self.current_freq
-        # samps = int(period * self.FS)
-        # samps = samps * 2
-        # for chan in range(0, wt.shape[1]):
-        #     plt.plot(wt[:samps, chan])
-        #     plt.show()
-        #     plt.close()
+        # Calculate the RETSPL-adjusted, single channel level
+        final_single_chan_level = self.stim_model.calc_presentation_lvl(
+            stair_lvl=self.staircase.current_level,
+            freq = self.current_freq
+        )
 
         # Apply offset to desired dB level
         # (Also update sessionpars)
-        self._calc_level(self.staircase.current_level)
+        self._calc_level(final_single_chan_level)
+
+        # # Print values to console
+        # print(f"Staircase level: {self.staircase.current_level}")
+        # print(f"Unscaled final single chan level: {final_single_chan_level}")
+        # print(f"Scaled final single chan level: " +
+        #       f"{self.sessionpars['adjusted_level_dB'].get()}")
 
         # Pause
         time.sleep(0.5)
@@ -397,7 +371,7 @@ class Application(tk.Tk):
         self.main_frame.interval_1_colors()
         if self.stim_interval == 1:
             self.present_audio(
-                audio=wt,
+                audio=self.stim,
                 pres_level=self.sessionpars['adjusted_level_dB'].get(),
                 sampling_rate=self.FS
             )
@@ -411,7 +385,7 @@ class Application(tk.Tk):
         self.main_frame.interval_2_colors()
         if self.stim_interval == 2:
             self.present_audio(
-                audio=wt,
+                audio=self.stim,
                 pres_level=self.sessionpars['adjusted_level_dB'].get(),
                 sampling_rate=self.FS
             )
@@ -420,24 +394,27 @@ class Application(tk.Tk):
         # End
         self.main_frame.clear_interval_colors()
 
+        # Wait to bind keys until after trial has finished
+        #   to avoid multiple submissions during the presentation
+        self.after(10, lambda: self.bind_keys())
+
 
     ########################
     # Main View Functions #
     ########################
     def _on_1(self):
-        """ Set response value to 1 (yes).
-        """
+        """ Set response value to 1 (yes). """
         self.response = 1
 
 
     def _on_2(self):
-        """ Set response value to 0 (no).
-        """
+        """ Set response value to 0 (no). """
         self.response = 2
 
 
     def _on_submit(self):
         """ Assign response value and save to file.
+            Update key bindings.
             Present next trial.
         """
         # Assign response value
@@ -454,6 +431,9 @@ class Application(tk.Tk):
         # Update trial counter
         self.trial += 1
 
+        # Unbind keys for the start of the next trial
+        self.unbind_keys()
+
         # Check for end of staircase
         if not self.staircase.status:
             print(f"\ncontroller: End of staircase!")
@@ -466,8 +446,7 @@ class Application(tk.Tk):
 
 
     def _save_trial_data(self):
-        """ Select data to save and send to csv model.
-        """
+        """ Select data to save and write to CSV. """
         # Get tk variable values
         converted = dict()
         for key in self.sessionpars:
@@ -478,7 +457,6 @@ class Application(tk.Tk):
 
         # Add 1 to trial number
         converted['trial'] = self.trial + 1
-        #converted['trial_number'] += 1
 
         # Add current test frequency to dict
         converted['test_freq'] = self.current_freq
@@ -487,7 +465,7 @@ class Application(tk.Tk):
         save_list = [
             'trial', 'subject', 'condition', 'min_level', 'max_level', 
             'duration', 'step_sizes', 'num_reversals', 'rapid_descend', 
-            'slm_reading', 'cal_level_dB', 'slm_offset', 'adjusted_level_dB', 
+            'slm_reading', 'cal_level_dB', 'slm_offset', 'adjusted_level_dB',
              'desired_level_dB', 'test_freq', 'response', 'reversal'
         ]
 
@@ -524,17 +502,14 @@ class Application(tk.Tk):
     # Session Dialog Functions #
     ############################
     def _show_session_dialog(self):
-        """ Show session parameter dialog
-        """
+        """ Show session parameter dialog. """
         print("\ncontroller: Calling session dialog...")
         self.update_idletasks()
         sessionview.SessionDialog(self, self.sessionpars)
-        #self.sv = sessionview.SessionDialog(self, self.sessionpars)
 
 
     def _load_sessionpars(self):
-        """ Load parameters into self.sessionpars dict 
-        """
+        """ Load parameters into self.sessionpars dict. """
         vartypes = {
         'bool': tk.BooleanVar,
         'str': tk.StringVar,
@@ -552,8 +527,7 @@ class Application(tk.Tk):
 
 
     def _save_sessionpars(self, *_):
-        """ Save current runtime parameters to file 
-        """
+        """ Save current runtime parameters to file. """
         print("\ncontroller: Calling sessionpars model set and save funcs")
         for key, variable in self.sessionpars.items():
             self.sessionpars_model.set(key, variable.get())
@@ -578,6 +552,7 @@ class Application(tk.Tk):
     # Data Menu Functions #
     #######################
     def show_scoring_dialog(self):
+        """ Display the threshold calculation dialog. """
         print("\ncontroller: Calling threshold dialog")
         dataview.ThresholdDialog(self)
 
@@ -586,8 +561,7 @@ class Application(tk.Tk):
     # Calibration Dialog Functions #
     ################################
     def play_calibration_file(self):
-        """ Load calibration file and present
-        """
+        """ Load calibration file and present. """
         # Get calibration file
         try:
             self.calmodel.get_cal_file()
@@ -605,8 +579,7 @@ class Application(tk.Tk):
 
 
     def _calc_offset(self):
-        """ Calculate offset based on SLM reading.
-        """
+        """ Calculate offset based on SLM reading. """
         # Calculate new presentation level
         self.calmodel.calc_offset()
         # Save level - this must be called here!
@@ -625,8 +598,7 @@ class Application(tk.Tk):
     # Help Menu Functions #
     #######################
     def _show_help(self):
-        """ Create html help file and display in default browser
-        """
+        """ Create html README file and display in browser. """
         print(f"\ncontroller: Calling README file (will open in browser)")
         # Read markdown file and convert to html
         with open(README.README_MD, 'r') as f:
@@ -642,8 +614,7 @@ class Application(tk.Tk):
 
 
     def _show_changelog(self):
-        """ Create html help file and display in default browser
-        """
+        """ Create html CHANGELOG file and display in browser. """
         print(f"\ncontroller: Calling CHANGELOG file (will open in browser)")
         # Read markdown file and convert to html
         with open(README.CHANGELOG_MD, 'r') as f:
@@ -662,6 +633,7 @@ class Application(tk.Tk):
     # Audio Functions #
     ###################
     def present_audio(self, audio, pres_level, **kwargs):
+        """ Attempt to create and present audio object. """
         # Load audio
         try:
             self._create_audio_object(audio, **kwargs)
@@ -685,7 +657,7 @@ class Application(tk.Tk):
 
 
     def _create_audio_object(self, audio, **kwargs):
-        # Create audio object
+        """ Create audio object from audiomodel. """
         try:
             self.a = audiomodel.Audio(
                 audio=audio,
@@ -750,10 +722,11 @@ class Application(tk.Tk):
 
 
     def stop_audio(self):
+        """ Stop audio presentation. """
         try:
             self.a.stop()
         except AttributeError:
-            print("\ncontroller: Stop called, but there is no audio object!")
+            print("\ncontroller: Stop called without audio object!")
 
 
     def _format_routing(self, routing):
