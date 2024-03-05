@@ -108,15 +108,20 @@ class StimulusModel:
         # Get number of sources/channels
         stim_chans = self.sessionpars['num_stim_chans'].get()
         
-        # List of possible starting phases that Daniel Smieja
-        # vetted for me.
-        degrees = [0, 40, 80, 120, 140, -40, -80, -120, -140]
-        # Create an independent random number rng
-        rng = random.Random(217)
-        # Get list of random phases in degrees
-        random_degs = rng.sample(degrees, k=stim_chans)
+        # # List of possible starting phases that Daniel Smieja
+        # # vetted for me.
+        # degrees = [0, 40, 80, 120, 140, -40, -80, -120, -140]
+
+        # # Create an independent random number rng
+        # rng = random.Random(217)
+        # # Get list of random phases in degrees
+        # random_degs = rng.sample(degrees, k=stim_chans)
+
+        degrees = [140, 120, 40, 80, -80, 0, -140, -120, -40]
+
         # Return random phases in radians
-        return np.radians(random_degs)
+        return np.radians(degrees[:stim_chans])
+        #return np.radians(random_degs)
 
 
     def create_stimulus(self, dur, fs, fc, mod_rate, mod_depth):

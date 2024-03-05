@@ -99,7 +99,7 @@ class TestAudioModel(TestCase):
     # Import .wav files #
     def test_import_valid_mono_wav(self):
         # Create audio object
-        self.a_mono_wav = audiomodel.Audio(Path(r'./sample_stim.wav'))
+        self.a_mono_wav = audiomodel.Audio(Path(r'.\test\sample_stim.wav'))
         # Number of channels
         self.assertEqual(self.a_mono_wav.num_channels, 1)
         # Duration
@@ -107,7 +107,7 @@ class TestAudioModel(TestCase):
 
     def test_invalid_audio_type(self):
         with self.assertRaises(audio_exceptions.InvalidAudioType):
-            self.a_mono_wav = audiomodel.Audio(r'./sample_stim.wav')
+            self.a_mono_wav = audiomodel.Audio(r'.\test\sample_stim.wav')
 
     def test_file_not_found(self):
         with self.assertRaises(FileNotFoundError):

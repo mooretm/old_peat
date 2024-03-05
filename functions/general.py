@@ -213,7 +213,7 @@ def calc_RMS_based_on_sources(desired_SPL, num_sources):
     new_power_single = power_single - cf_power
     # Convert single channel power to SPL
     new_spl_level = 10 * np.log10(new_power_single)
-
+    
     return new_spl_level
 
 

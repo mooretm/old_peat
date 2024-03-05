@@ -40,17 +40,17 @@ class ScoringModel:
         self.data.reset_index(drop=True, inplace=True)
 
 
-    def _avg_revs(self, df, num_reversals):
+    def _avg_revs(self, df, num_reversals) -> float:
         """ Custom function for use with Pandas apply().
             Called from score().
             Find last n reversals and average to calculate thresholds.
+
+            Returns: a single threshold value (rounded)
         """
         # Get indexes of last n reversals
         last_n_indexes = df.index[df['reversal']==True].to_list()[-num_reversals:]
-
         # Calculate thresholds
         thresholds = np.round(np.mean(df['desired_level_dB'][last_n_indexes]), 2)
-
         return thresholds
         
 
@@ -71,9 +71,13 @@ class ScoringModel:
 
         # Organize dataframe
         thresholds_df = thresholds.reset_index()
-        thresholds_df = thresholds_df.rename(columns={0:'threshold'})
+        self.thresholds_df = thresholds_df.rename(columns={0:'threshold'})
 
+        self.write_to_csv(self.thresholds_df)
+
+
+    def write_to_csv(self, data_to_write):
+        """ Wrapper 'to_csv' function for easier unit testing. """
         # Write thresholds to CSV
-        thresholds_df.to_csv('thresholds.csv', index=False)
-
+        data_to_write.to_csv('thresholds.csv', index=False)
         print(f"\nscoringmodel: Thresholds written to CSV successfully")
