@@ -250,6 +250,61 @@ class SessionDialog(tk.Toplevel):
         self.deiconify()
 
 
+    def _check_channels(self):
+        """ Ensure the number of channels is less than the number of 
+            non-overlapping phi values (see stimulusmodel>
+            _get_random_phis).
+        """
+        # Get value from entry box
+        chans = self.sessionpars['num_stim_chans'].get()
+
+        # Looks like the tk.IntVar forces to an integer?
+        # This doesn't get called, even with a float value.
+        # Dangerous because there is no warning. It seems like
+        # the previous value is used?
+        if not isinstance(chans, int):
+            return False
+        
+        if chans > 9:
+            return False
+        
+        return True
+
+
+    def _check_test_freqs(self):
+        """ Ensure only valid test frequencies have been entered. """
+        # List of valid frequencies
+        valid_freqs = [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 
+                        200, 250, 315, 400, 500, 630, 750, 800, 1000, 
+                        1250, 1500, 1600, 2000, 2500, 3000, 4000, 
+                        6000, 6300, 8000, 9000, 10000, 11200, 14000, 
+                        16000]
+        
+        # Get raw frequencies from entry box
+        test_freqs = self.sessionpars['test_freqs'].get()
+
+        # Attempt to convert to integers
+        try:
+            test_freqs = [int(val) for val in test_freqs.split(', ')]
+        except ValueError:
+            return False
+        
+        # Test for invalid frequencies
+        if not set(test_freqs).issubset(valid_freqs):
+            return False
+        return True
+    
+
+    def _check_step_sizes(self):
+        """ Ensure step sizes are integers. """
+        steps = self.sessionpars['step_sizes'].get()
+        try:
+            steps = [int(val) for val in steps.split(', ')]
+        except ValueError:
+            return False
+        return True
+
+
     def _check_reversals(self):
         """ Ensure there are enough reversals for step sizes. """
         revs = self.sessionpars['num_reversals'].get() 
@@ -276,23 +331,53 @@ class SessionDialog(tk.Toplevel):
         elif self.sessionpars['rapid_descend'].get() == "No":
             self.sessionpars['rapid_descend_bool'].set(False)
 
+        # Make sure the number of channels is supported by
+        #   the number of non-overlapping phis.
+        if not self._check_channels():
+            messagebox.showerror(
+                title="Invalid Channels",
+                message="Invalid number of channels!",
+                detail="The maximum number of channels is nine."\
+                    "\nChannels must be integers."
+            )
+            return            
+
+        # Check that frequencies are allowable (have RETSPLs)
+        if not self._check_test_freqs():
+            messagebox.showerror(
+                title="Invalid Frequency",
+                message="Invalid test frequency found!",
+                detail="See Help>README for a list of valid test frequencies."
+            )
+            return  
+        
         # Make sure the number of reversals at least matches
         #   the number of steps
         if not self._check_reversals():
             messagebox.showerror(
                 title="Not Enough Reversals",
                 message="The number of reversals must at least equal the " + 
-                    "number of steps."
+                    "number of steps!"
             )
             return
         
+        # Make sure max_level > min_level
         if not self._check_levels():
             messagebox.showerror(
                 title="Invalid Levels",
-                message="The maximum level must exceed the minimum level."
+                message="The maximum level must exceed the minimum level!"
             )
             return
 
+        # Make sure step sizes are integers
+        if not self._check_step_sizes():
+            messagebox.showerror(
+                title="Invalid Step Size",
+                message="Step sizes must be integers!"
+            )
+            return
+
+        # Send save event to controller
         print("\nviews_sessiondialog: Sending save event...")
         self.parent.event_generate('<<SessionSubmit>>')
         self.destroy()

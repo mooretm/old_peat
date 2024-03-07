@@ -12,9 +12,9 @@
 
     Written by: <b>Travis M. Moore</b>
     <br>
-    Latest version: <b>Version 2.0.0</b><br>
+    Latest version: <b>Version 2.0.1</b><br>
     Originally created: <b>January 04, 2024</b><br>
-    Last edited: <b>February 29, 2024</b><br><br>
+    Last edited: <b>March 5, 2024</b><br><br>
 </div>
 
 <hr />
@@ -60,8 +60,18 @@
 <br>
 <br></p>
 <hr />
+<h1>Valid Test Frequencies</h1>
+<p>Because estimation of audiometric thresholds relies on RETSPLs (reference equivalent threshold sound pressure levels), only a subset of frequencies can be reliably tested with PEAT. Valid frequencies are mostly 1/3 octave values, with a few audiometric additions (e.g., 6000 Hz). </p>
+<p>Full list of test frequencies allowable with PEAT:<br>
+<code>20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160,
+200, 250, 315, 400, 500, 630, 750, 800, 1000, 1250,
+1500, 1600, 2000, 2500, 3000, 4000, 6000, 6300, 8000, 9000,
+10000, 1200, 14000, 16000</code>
+<br>
+<br></p>
+<hr />
 <h1>Main Screen</h1>
-<p>The image below shows the main screen of the P.E.A.T. application. </p>
+<p>The image below shows the main screen of the P.E.A.T. application.  </p>
 <p><img src="main_window.png" alt="Main Window Image" width="300"/></p>
 <h2>Intervals</h2>
 <p>The top half of the screen (i.e., above the horizontal grey line) is used to display intervals during the task. When an interval is active, the box will turn blue. Every trial will follow the pattern:</p>
@@ -83,6 +93,7 @@
 <h1>File Menu</h1>
 <h2>File&gt;Settings</h2>
 <p>The image below shows the options available by navigating to <code>File&gt;Settings</code>.</p>
+<p>NOTE: The values entered in the image below are good default values for testing SoundGear devices.</p>
 <p><img src="settings_window.png" alt="Settings Window Image" width="400"/></p>
 <h3><u>Session Information</u></h3>
 <p><b>Subject:</b> A unique subject identifier. Can be alpha, numeric, or both.</p>
@@ -119,7 +130,7 @@
 <p><b>Calibration Stimulus.</b> You can choose to use the built-in white noise, or provide a custom file for the calibration signal (top group in image). If a multi-channel custom calibration file is provided, ensure the correct number of channels have been assigned in <code>Tools&gt;Audio Settings</code>. </p>
 <p><b>Playback Controls.</b> Use the <code>Level (dB)</code> entry box to adjust the digital playback level in dB (middle group in image). Adjust the level until the SLM reads above the noise floor of the room. The <code>Play</code> and <code>Stop</code> buttons allow you to start and stop the audio playback.</p>
 <p><b>Measured Level.</b> Use an SLM to measure the level of the calibration signal and enter the value into the <code>SLM Reading (dB)</code> entry box (bottom group in image). Click submit, and the application will calculate an offset so that you can specify presentation levels in dB (whichever type of dB you set the SLM to when measuring). </p>
-<p>NOTE: For multi-channel files, the SLM offset is applied to each channel individually. </p>
+<p>NOTE: For multi-channel files, the same SLM offset is applied to each channel individually. <b>Currently there is not support for multiple SLM offsets.</b></p>
 <p>NOTE: The <code>Submit</code> button is disabled until you click the <code>Play</code> button.
 <br>
 <br></p>
@@ -129,7 +140,7 @@
 <p>The data window (below) provides an easy-to-use interface for calculating estimated thresholds from raw data files from this application. Batching capabilities are built in, and only require that all raw data files are located in the same directory.</p>
 <p><img src="data_window.png" alt="Data Window" width="500"/></p>
 <h2>Options</h2>
-<p><b>Number of Reversals for Averaging:</b> The number of reversals to average over (starting at the last trial and moving backwards) for calculating a threshold. A minimum of three reversals is suggested. DO NOT INCLUDE THE INITIAL REVERSAL IN THE AVERAGE. </p>
+<p><b>Number of Reversals for Averaging:</b> The number of reversals to average over (starting at the last trial and moving backwards) for calculating a threshold. A minimum of three reversals is suggested. DO NOT INCLUDE THE INITIAL REVERSAL IN THE AVERAGE. <b>The user is responsible for entering a valid number based on the parameters used for estimating thresholds. </b></p>
 <p>NOTE: The maximum permissible value depends on the number of reversals that were originally obtained during the task (see File&gt;Settings). </p>
 <p><b>Threshold Data Directory:</b> Click the <code>Browse</code> button to open a file explorer. Simply navigate to the directory where the raw data are stored. </p>
 <p><b>Submit:</b> Upon clicking the <code>Submit</code> button, thresholds will be calculated based on the factors of subject, condition, and test frequency. If finer granularity is desired, a custom analysis script must be used. The thresholds will be written to a CSV file named "thresholds.csv" that will appear in the directory from which the application itself is being run. 

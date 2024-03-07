@@ -104,7 +104,18 @@ def test_assign_stimulus_interval(monkeypatch, stim_model):
     assert stim_model.assign_stimulus_interval([1,2]) == 1
 
 
-def test_calc_presentation_lvl(monkeypatch, stim_model):
+def test_calc_presentation_lvl_invalid_freq(monkeypatch, stim_model):
+    # Mock function to replace general.calc_RMS_based_on_sources
+    def mock_level(desired_SPL, num_sources):
+        return 45.4568165
+    # Apply monkeypatch
+    monkeypatch.setattr(general, "calc_RMS_based_on_sources", mock_level)
+    # Act
+    with pytest.raises(KeyError) as exc_info:
+        level = stim_model.calc_presentation_lvl(stair_lvl=30, freq=1100)
+
+
+def test_calc_presentation_lvl_valid_freq(monkeypatch, stim_model):
     # Mock function to replace general.calc_RMS_based_on_sources
     def mock_level(desired_SPL, num_sources):
         return 45.4568165

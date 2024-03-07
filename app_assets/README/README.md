@@ -13,9 +13,9 @@
 
     Written by: <b>Travis M. Moore</b>
     <br>
-    Latest version: <b>Version 2.0.0</b><br>
+    Latest version: <b>Version 2.0.1</b><br>
     Originally created: <b>January 04, 2024</b><br>
-    Last edited: <b>February 29, 2024</b><br><br>
+    Last edited: <b>March 5, 2024</b><br><br>
 </div>
 
 ---
@@ -63,8 +63,23 @@ You will see a message appear after each threshold is completed to allow you tim
 
 ---
 
+# Valid Test Frequencies
+Because estimation of audiometric thresholds relies on RETSPLs (reference equivalent threshold sound pressure levels), only a subset of frequencies can be reliably tested with PEAT. Valid frequencies are mostly 1/3 octave values, with a few audiometric additions (e.g., 6000 Hz). 
+
+Full list of test frequencies allowable with PEAT:<br>
+```
+20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160,
+200, 250, 315, 400, 500, 630, 750, 800, 1000, 1250,
+1500, 1600, 2000, 2500, 3000, 4000, 6000, 6300, 8000, 9000,
+10000, 1200, 14000, 16000
+```
+<br>
+<br>
+
+---
+
 # Main Screen
-The image below shows the main screen of the P.E.A.T. application. 
+The image below shows the main screen of the P.E.A.T. application.  
 
 <img src="main_window.png" alt="Main Window Image" width="300"/>
 
@@ -95,6 +110,8 @@ The bottom half of the screen (i.e., below the horizontal grey line) is used to 
 
 ## File>Settings
 The image below shows the options available by navigating to ```File>Settings```.
+
+NOTE: The values entered in the image below are good default values for testing SoundGear devices.
 
 <img src="settings_window.png" alt="Settings Window Image" width="400"/>
 
@@ -160,7 +177,7 @@ NOTE: Calibration files are imported without any scaling applied. In essence, "d
 
 <b>Measured Level.</b> Use an SLM to measure the level of the calibration signal and enter the value into the ```SLM Reading (dB)``` entry box (bottom group in image). Click submit, and the application will calculate an offset so that you can specify presentation levels in dB (whichever type of dB you set the SLM to when measuring). 
 
-NOTE: For multi-channel files, the SLM offset is applied to each channel individually. 
+NOTE: For multi-channel files, the same SLM offset is applied to each channel individually. <b>Currently there is not support for multiple SLM offsets.</b>
 
 NOTE: The ```Submit``` button is disabled until you click the ```Play``` button.
 <br>
@@ -176,7 +193,7 @@ The data window (below) provides an easy-to-use interface for calculating estima
 <img src="data_window.png" alt="Data Window" width="500"/>
 
 ## Options
-<b>Number of Reversals for Averaging:</b> The number of reversals to average over (starting at the last trial and moving backwards) for calculating a threshold. A minimum of three reversals is suggested. DO NOT INCLUDE THE INITIAL REVERSAL IN THE AVERAGE. 
+<b>Number of Reversals for Averaging:</b> The number of reversals to average over (starting at the last trial and moving backwards) for calculating a threshold. A minimum of three reversals is suggested. DO NOT INCLUDE THE INITIAL REVERSAL IN THE AVERAGE. <b>The user is responsible for entering a valid number based on the parameters used for estimating thresholds. </b>
 
 NOTE: The maximum permissible value depends on the number of reversals that were originally obtained during the task (see File>Settings). 
 

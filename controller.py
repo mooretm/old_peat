@@ -68,8 +68,8 @@ class Application(tk.Tk):
         # Constants #
         #############
         self.NAME = 'P.E.A.T.'
-        self.VERSION = '2.0.0'
-        self.EDITED = 'February 29, 2024'
+        self.VERSION = '2.0.1'
+        self.EDITED = 'March 5, 2024'
 
         # Create menu settings dictionary
         self._app_info = {
