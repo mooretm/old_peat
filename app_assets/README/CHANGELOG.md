@@ -2,6 +2,17 @@
 <h2 style="text-align: center;">(P.sychophysical E.stimation of A.uditory T.hresholds)</h2>
 ---
 
+## Version 2.0.2
+
+Date: May 14, 2024
+
+### Patches
+1. Replaced white noise calibration file with 1 kHz warble tone scaled to -30 dB.
+<br>
+<br>
+
+---
+
 ## Version 2.0.1
 
 Date: March 5, 2024
@@ -10,6 +21,10 @@ Date: March 5, 2024
 1. Added several unit tests to test suite.
 2. Added validation for several fields in the File>Settings window.
 3. Updated README file with list of valid test frequencies.
+<br>
+<br>
+
+---
 
 ## Version 2.0.0
 

@@ -71,7 +71,7 @@ class CalibrationDialog(tk.Toplevel):
         ##############################
         # Radio buttons
         # Default white noise stimulus
-        rad_wgn = ttk.Radiobutton(lfrm_load, text="White Noise", takefocus=0,
+        rad_wgn = ttk.Radiobutton(lfrm_load, text="1 kHz Warble", takefocus=0,
             variable=self.cal_var, value='wgn', command=self._cal_type)
         rad_wgn.grid(column=5, row=0, columnspan=10, sticky='w', 
             **options_small)

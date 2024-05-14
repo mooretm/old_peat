@@ -5,7 +5,10 @@ Data/
 *.wav
 *.doc
 *.docx
+*.spec
 output/
 archive/
 sample.py
 venv/
+build/
+dist/
