@@ -105,11 +105,12 @@ class SessionDialog(tk.Toplevel):
 
         # STIMULUS #
         # Number of channels for stimulus
-        lbl_num_chans = ttk.Label(frm_stimulus, text="Channels:")
+        lbl_num_chans = ttk.Label(frm_stimulus, text="# of Channels:")
         lbl_num_chans.grid(row=5, column=5, sticky='e', **widget_options)
         num_chans_tt = Hovertip(
             anchor_widget=lbl_num_chans,
-            text="The number of channels for audio playback.\nUpdate channel routing accordingly.",
+            text="A SINGLE number stating how many channels are desired" + 
+                "\nUpdate channel routing accordingly.",
             hover_delay=tt_delay
         )
         ttk.Entry(frm_stimulus, width=20, 
@@ -255,20 +256,28 @@ class SessionDialog(tk.Toplevel):
             non-overlapping phi values (see stimulusmodel>
             _get_random_phis).
         """
-        # Get value from entry box
-        chans = self.sessionpars['num_stim_chans'].get()
+        try:
+            # Get value from entry box
+            chans = self.sessionpars['num_stim_chans'].get()
 
-        # Looks like the tk.IntVar forces to an integer?
-        # This doesn't get called, even with a float value.
-        # Dangerous because there is no warning. It seems like
-        # the previous value is used?
-        if not isinstance(chans, int):
-            return False
-        
-        if chans > 9:
-            return False
-        
-        return True
+            # Looks like the tk.IntVar forces to an integer?
+            # This doesn't get called, even with a float value.
+            # Dangerous because there is no warning. It seems like
+            # the previous value is used?
+            if not isinstance(chans, int):
+                return False
+            if chans > 9:
+                return False
+            return True
+        except tk.TclError:
+            messagebox.showwarning(
+                title="Invalid Entry!",
+                message="Please enter a single integer for the total number " +
+                    "of channels for audio playback.",
+                detail="Do not enter every channel here: do that in the " +
+                    "audio device settings."
+            )
+            raise
 
 
     def _check_test_freqs(self):
@@ -338,9 +347,9 @@ class SessionDialog(tk.Toplevel):
                 title="Invalid Channels",
                 message="Invalid number of channels!",
                 detail="The maximum number of channels is nine."\
-                    "\nChannels must be integers."
+                    "\nEnter a single integer."
             )
-            return            
+            return
 
         # Check that frequencies are allowable (have RETSPLs)
         if not self._check_test_freqs():

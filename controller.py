@@ -26,6 +26,7 @@ from tkinter import messagebox
 # System
 from pathlib import Path
 import time
+import numpy as np
 
 # Misc
 import webbrowser
@@ -417,6 +418,9 @@ class Application(tk.Tk):
             Update key bindings.
             Present next trial.
         """
+        # Grab the current staircase level before it updates
+        self.sessionpars['current_stair_level'].set(self.staircase.current_level)
+
         # Assign response value
         if (self.response == 1) and (self.stim_interval == 1):
             self.staircase.add_response(1)
@@ -461,12 +465,26 @@ class Application(tk.Tk):
         # Add current test frequency to dict
         converted['test_freq'] = self.current_freq
 
+
+        """ Display more about the calculations in the output CSV. """
+        # Calculate the overall level based on the level for a single speaker
+        # (i.e., self.sessionpars['desired_level_dB])
+        chans = converted['num_stim_chans']
+        entered_lvl = converted['desired_level_dB']
+        converted['calculated_oal'] = np.round(10 * np.log10(chans) + entered_lvl, 1)
+
+        # Overwrite the desired_level_dB value to what the user entered
+        #converted['desired_level_dB'] = self.staircase.current_level
+        
+
         # Define selected items for writing to file
         save_list = [
             'trial', 'subject', 'condition', 'min_level', 'max_level', 
             'duration', 'step_sizes', 'num_reversals', 'rapid_descend', 
-            'slm_reading', 'cal_level_dB', 'slm_offset', 'adjusted_level_dB',
-             'desired_level_dB', 'test_freq', 'response', 'reversal'
+            'num_stim_chans', 'slm_reading', 
+            'cal_level_dB', 'slm_offset', 'adjusted_level_dB', 
+            'desired_level_dB', 'current_stair_level', 'calculated_oal', 
+            'test_freq', 'response', 'reversal'
         ]
 
         # Create new dict with desired items

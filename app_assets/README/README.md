@@ -123,9 +123,9 @@ NOTE: The values entered in the image below are good default values for testing 
 <b>Display Plots:</b> Display staircase plots after each threshold. Useful for troubleshooting and training.
 
 ### <u>Stimulus Options</u>
-<b>Channels:</b> The number of channels for audio playback. Each separate channel will contain a mono copy of the stimulus with a random starting phase, for use in the sound field. 
+<b>Channels:</b> A single integer for the total number of channels for audio playback. 
 
-NOTE: You must update the channel routing accordingly. For example, a four-channel stimulus will require specifying four playback channels in ```Tools>Audio Settings```.
+NOTE: You must update the channel routing accordingly. For example, a four-channel stimulus will require specifying four playback channels in ```Tools>Audio Settings```. Each separate channel will contain a mono copy of the stimulus with a random starting phase, for use in the sound field. 
 
 <b>Duration (s):</b> Duration of the stimulus (per interval) in seconds.
 

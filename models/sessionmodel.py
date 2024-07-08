@@ -40,6 +40,11 @@ class SessionParsModel:
         # 'audio_files_dir': {'type': 'str', 'value': 'Please select a folder'},
         # 'matrix_file_path': {'type': 'str', 'value': 'Please select a file'},
 
+        # Level conversion variables
+        'calculated_oal': {'type': 'float', 'value': 999},
+        'current_stair_level': {'type': 'float', 'value': 999},
+
+
         # Audio device variables
         'audio_device': {'type': 'int', 'value': 999},
         'channel_routing': {'type': 'str', 'value': '1'},
