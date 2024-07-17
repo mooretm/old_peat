@@ -1,19 +1,16 @@
 """ Model for storing session parameters. """
 
 ###########
-# IMPORTS #
+# Imports #
 ###########
-# Import system packages
-from pathlib import Path
-import os
-
-# Import data handling packages
+# Standard library
 import json
+import os
+from pathlib import Path
 
-
-#########
-# BEGIN #
-#########
+####################
+# SessionParsModel #
+####################
 class SessionParsModel:
     # Define shared dictionary items (class variable)
     fields = {
@@ -33,17 +30,13 @@ class SessionParsModel:
         'max_level': {'type': 'float', 'value': 90},
         'step_sizes': {'type': 'str', 'value': "10, 5, 2"},
         'num_reversals': {'type': 'int', 'value': 5},
+        'max_trials': {'type': 'int', 'value': 40},
         'rapid_descend': {'type': 'str', 'value': 'Yes'},
         'rapid_descend_bool': {'type': 'bool', 'value': True},
-        
-        # # Stimulus variables
-        # 'audio_files_dir': {'type': 'str', 'value': 'Please select a folder'},
-        # 'matrix_file_path': {'type': 'str', 'value': 'Please select a file'},
 
         # Level conversion variables
         'calculated_oal': {'type': 'float', 'value': 999},
         'current_stair_level': {'type': 'float', 'value': 999},
-
 
         # Audio device variables
         'audio_device': {'type': 'int', 'value': 999},
@@ -66,10 +59,12 @@ class SessionParsModel:
             r'\\starfile\Public\Temp\MooreT\Custom Software\version_library.csv'},
     }
 
-
+    ###########
+    # Methods #
+    ###########
     def __init__(self, _app_info):
         """ Create config file and directory.
-            Load values if a config file already exists.
+        Load values if a config file already exists.
         """
         # Assign variables
         self._app_info = _app_info
@@ -120,19 +115,14 @@ class SessionParsModel:
                     raw_value = raw_values[key]['value']
                 self.fields[key]['value'] = raw_value
 
-
     def save(self):
-        """ Save current session parameters to file. """
+        """ Save entered session parameters to file. """
         # Write to JSON file
-        #print("sessionmodel: Writing session pars from model to file...")
         with open(self.filepath, 'w') as fh:
             json.dump(self.fields, fh)
 
-
     def set(self, key, value):
         """ Set a variable value. """
-        #print("sessionmodel: Setting sessionpars model " +
-        #    "fields with running vals...")
         if (
             key in self.fields and 
             type(value).__name__ == self.fields[key]['type']

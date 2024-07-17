@@ -18,21 +18,19 @@
 ###########
 # Imports #
 ###########
-# GUI
+# Standard library
+import time
 import tkinter as tk
+import webbrowser
+from pathlib import Path
 from tkinter import ttk
 from tkinter import messagebox
 
-# System
-from pathlib import Path
-import time
+# Third party
+import markdown
 import numpy as np
 
-# Misc
-import webbrowser
-import markdown
-
-# Custom Modules
+# Custom modules
 # Menus
 from menus import mainmenu
 # Exceptions
@@ -69,8 +67,8 @@ class Application(tk.Tk):
         # Constants #
         #############
         self.NAME = 'P.E.A.T.'
-        self.VERSION = '2.0.2'
-        self.EDITED = 'May 14, 2024'
+        self.VERSION = '2.1.0' #'2.0.2'
+        self.EDITED = 'July 17, 2024'
 
         # Create menu settings dictionary
         self._app_info = {
@@ -107,8 +105,8 @@ class Application(tk.Tk):
         self.trial = 0
 
         # Load current session parameters from file
-        # or load defaults if file does not exist yet
-        # Check for version updates and destroy if mandatory
+        # or load defaults if file does not exist yet.
+        # Check for version updates and destroy if mandatory.
         self.sessionpars_model = sessionmodel.SessionParsModel(self._app_info)
         self._load_sessionpars()
 
@@ -231,8 +229,8 @@ class Application(tk.Tk):
 
     def _progress_bar(self):
         """ Create and position task progress bar. The progress 
-            bar updates based on the number of frequencies 
-            remaining to test in a given session.
+        bar updates based on the number of frequencies 
+        remaining to test in a given session.
         """
         self.progress_bar = ttk.Progressbar(
             master=self,
@@ -264,11 +262,14 @@ class Application(tk.Tk):
     # File Menu Funcs #
     ###################
     def start_new_run(self):
-        """ 1. Disable "Start Task" from file menu.
-            2. Get number of frequencies to test (for progress bar).
-            3. Create staircase.
-            4. Present first trial.
-            Repeat steps 2 - 4 for each new run (i.e., frequency).
+        """ Prepare new staircase for next frequency in list.
+
+        1. Disable "Start Task" from file menu.
+        2. Get number of frequencies to test (for progress bar).
+        3. Create staircase.
+        4. Present first trial.
+
+        Repeat steps 2 - 4 for each new run (i.e., frequency).
         """
         # Check for first run
         if self._first_run_flag:
@@ -336,6 +337,17 @@ class Application(tk.Tk):
 
     def _new_trial(self):
         """ Present a 2IAFC trial. """
+        # Check for max number of trials
+        if self.trial > self.sessionpars['max_trials'].get():
+            messagebox.showerror(
+                title="Invalid Trial Number",
+                message="You have reached the maximum number of trials " +
+                    "for this frequency; please let the investigator " +
+                    "know."
+            )
+            self._quit()
+            return
+
         # Print message to console
         self.msg = f"Trial {self.trial}: {self.current_freq} Hz"
         print('')
@@ -366,7 +378,7 @@ class Application(tk.Tk):
         #       f"{self.sessionpars['adjusted_level_dB'].get()}")
 
         # Pause
-        time.sleep(0.5)
+        time.sleep(1) # Was 0.5 seconds
         
         # Interval 1
         self.main_frame.interval_1_colors()
@@ -400,23 +412,23 @@ class Application(tk.Tk):
         self.after(10, lambda: self.bind_keys())
 
 
-    ########################
-    # Main View Functions #
-    ########################
+    #####################
+    # Main View Methods #
+    #####################
     def _on_1(self):
         """ Set response value to 1 (yes). """
         self.response = 1
 
 
     def _on_2(self):
-        """ Set response value to 0 (no). """
+        """ Set response value to 2 (no). """
         self.response = 2
 
 
     def _on_submit(self):
         """ Assign response value and save to file.
-            Update key bindings.
-            Present next trial.
+        Update key bindings.
+        Present next trial.
         """
         # Grab the current staircase level before it updates
         self.sessionpars['current_stair_level'].set(self.staircase.current_level)
@@ -465,17 +477,12 @@ class Application(tk.Tk):
         # Add current test frequency to dict
         converted['test_freq'] = self.current_freq
 
-
         """ Display more about the calculations in the output CSV. """
         # Calculate the overall level based on the level for a single speaker
         # (i.e., self.sessionpars['desired_level_dB])
         chans = converted['num_stim_chans']
         entered_lvl = converted['desired_level_dB']
         converted['calculated_oal'] = np.round(10 * np.log10(chans) + entered_lvl, 1)
-
-        # Overwrite the desired_level_dB value to what the user entered
-        #converted['desired_level_dB'] = self.staircase.current_level
-        
 
         # Define selected items for writing to file
         save_list = [

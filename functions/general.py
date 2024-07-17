@@ -1,13 +1,17 @@
-""" General functions library. """
+""" General functions library. 
+
+Written by: Travis M. Moore
+Last edited: July 17, 2024
+"""
 
 ###########
 # Imports #
 ###########
-# Import system packages
-import sys
+# Standard library
 import os
+import sys
 
-# Data science
+# Third party
 import numpy as np
 #import scipy.signal as s
 #from matplotlib import pyplot as plt

@@ -1,14 +1,13 @@
 __pycache__
-archive/
-Data/
 *.csv
 *.wav
 *.doc
 *.docx
 *.spec
-output/
+Data/
 archive/
 sample.py
 venv/
 build/
 dist/
+output/

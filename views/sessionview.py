@@ -205,6 +205,18 @@ class SessionDialog(tk.Toplevel):
         ttk.Entry(frm_staircase, width=20, 
             textvariable=self.sessionpars['num_reversals']
             ).grid(row=25, column=10, sticky='w')
+        
+        # Maximum number of trials
+        lbl_max_trials = ttk.Label(frm_staircase, text="Max Trials:")
+        lbl_max_trials.grid(row=25, column=5, sticky='e', **widget_options)
+        Hovertip(
+            anchor_widget=lbl_max_trials,
+            text="The maximum number of trials.\nThe app will stop if exceeded.",
+            hover_delay=tt_delay
+        )
+        ttk.Entry(frm_staircase, width=20, 
+            textvariable=self.sessionpars['max_trials']
+            ).grid(row=25, column=10, sticky='w')
 
         # Rapid Descend
         lbl_descend = ttk.Label(frm_staircase, text="Rapid Descend:")
