@@ -3,17 +3,16 @@
 ###########
 # Imports #
 ###########
-# Import GUI packages
+# Standard library
 import tkinter as tk
 from tkinter import messagebox
 
-# Import custom modules
+# Custom modules
 from app_assets import images
 
-
-#########
-# Begin #
-#########
+############
+# MainMenu #
+############
 class MainMenu(tk.Menu):
     """ Main Menu. """
     # Find parent window and tell it to 
@@ -90,7 +89,6 @@ class MainMenu(tk.Menu):
         )
         self.add_cascade(label='File', menu=self.file_menu)
 
-
         ##############
         # Tools menu #
         ##############
@@ -111,7 +109,6 @@ class MainMenu(tk.Menu):
         # Add Tools menu to the menubar
         self.add_cascade(label="Tools", menu=tools_menu)
 
-
         #############
         # Data Menu #
         #############
@@ -124,25 +121,6 @@ class MainMenu(tk.Menu):
         )
         # Add Data menu to the menubar
         self.add_cascade(label="Data", menu=data_menu)
-
-
-        #################
-        # Playback Menu #
-        #################
-        # playback_menu = tk.Menu(self, tearoff=False)
-        # playback_menu.add_command(
-        #     label="Start Audio",
-        #     command=self._event('<<PlaybackStart>>'),
-        #     accelerator='Spacebar'
-        # )
-        # playback_menu.add_separator()
-        # playback_menu.add_command(
-        #     label="Stop Audio",
-        #     command=self._event('<<PlaybackStop>>'),
-        #     accelerator='Ctrl+C'
-        # )
-        # self.add_cascade(label='Playback', menu=playback_menu)
-
 
         #############
         # Help Menu #
@@ -161,7 +139,7 @@ class MainMenu(tk.Menu):
             compound=tk.LEFT,
         )
         self.help_menu.add_command(
-            label="Change Log...",
+            label="CHANGELOG...",
             command=self._event('<<HelpChangelog>>'),
             image=self.icons['help_changelog'],
             compound=tk.LEFT,
@@ -169,12 +147,10 @@ class MainMenu(tk.Menu):
         # Add help menu to the menubar
         self.add_cascade(label="Help", menu=self.help_menu)
 
-
         #####################
         # Bind accelerators #
         #####################
         self._bind_accelerators()
-
 
     ##################
     # Menu Functions #

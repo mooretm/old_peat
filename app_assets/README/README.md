@@ -140,6 +140,8 @@ NOTE: You must update the channel routing accordingly. For example, a four-chann
 
 <b>Step Size(s):</b> The step size(s) used by the staircase for bracketing a threshold. The last step size will be repeated until all reversals have been collected. Separate multiple values with a comma and space (e.g., ```10, 5, 5, 2```). 
 
+<b>Max Trials:</b> The maximum number of permissible trials. If this number is exceeded, the app will display a message, then close. There should be no data loss, as each trial is written to CSV as it occurs. The app can be restarted, with a modified list of frequencies. 
+
 <b>Reversals:</b> The number of reversals to obtain before stopping the procedure. The number of reversals must be at least equal to the number of step sizes. Providing a number of reversals greater than the number of steps results in repeating the final step size until all reversals are completed. 
 
 NOTE: The number of reversals to collect is different than the number of reversals for averaging (i.e., to determine a threshold). 

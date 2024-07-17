@@ -175,42 +175,41 @@ class Application(tk.Tk):
         # Center main window
         self.center_window()
 
-        # Check for updates
-        if (self.sessionpars['check_for_updates'].get() == 'yes') and \
-        (self.sessionpars['config_file_status'].get() == 1):
-            _filepath = self.sessionpars['version_lib_path'].get()
-            u = versionmodel.VersionChecker(_filepath, self.NAME, self.VERSION)
-            if u.status == 'mandatory':
-                messagebox.showerror(
-                    title="New Version Available",
-                    message="A mandatory update is available. Please install " +
-                        f"version {u.new_version} to continue.",
-                    detail=f"You are using version {u.app_version}, but " +
-                        f"version {u.new_version} is available."
-                )
-                self.destroy()
-            elif u.status == 'optional':
-                messagebox.showwarning(
-                    title="New Version Available",
-                    message="An update is available.",
-                    detail=f"You are using version {u.app_version}, but " +
-                        f"version {u.new_version} is available."
-                )
-            elif u.status == 'current':
-                pass
-            elif u.status == 'app_not_found':
-                messagebox.showerror(
-                    title="Update Check Failed",
-                    message="Cannot retrieve version number!",
-                    detail=f"'{self.NAME}' does not exist in the version library."
-                 )
-            elif u.status == 'library_inaccessible':
-                messagebox.showerror(
-                    title="Update Check Failed",
-                    message="The version library is unreachable!",
-                    detail="Please check that you have access to Starfile."
-                )
-
+        # # Check for updates
+        # if (self.sessionpars['check_for_updates'].get() == 'yes') and \
+        # (self.sessionpars['config_file_status'].get() == 1):
+        #     _filepath = self.sessionpars['version_lib_path'].get()
+        #     u = versionmodel.VersionChecker(_filepath, self.NAME, self.VERSION)
+        #     if u.status == 'mandatory':
+        #         messagebox.showerror(
+        #             title="New Version Available",
+        #             message="A mandatory update is available. Please install " +
+        #                 f"version {u.new_version} to continue.",
+        #             detail=f"You are using version {u.app_version}, but " +
+        #                 f"version {u.new_version} is available."
+        #         )
+        #         self.destroy()
+        #     elif u.status == 'optional':
+        #         messagebox.showwarning(
+        #             title="New Version Available",
+        #             message="An update is available.",
+        #             detail=f"You are using version {u.app_version}, but " +
+        #                 f"version {u.new_version} is available."
+        #         )
+        #     elif u.status == 'current':
+        #         pass
+        #     elif u.status == 'app_not_found':
+        #         messagebox.showerror(
+        #             title="Update Check Failed",
+        #             message="Cannot retrieve version number!",
+        #             detail=f"'{self.NAME}' does not exist in the version library."
+        #          )
+        #     elif u.status == 'library_inaccessible':
+        #         messagebox.showerror(
+        #             title="Update Check Failed",
+        #             message="The version library is unreachable!",
+        #             detail="Please check that you have access to Starfile."
+        #         )
 
     #####################
     # General Functions #

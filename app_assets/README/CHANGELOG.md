@@ -1,5 +1,20 @@
-<h1 style="text-align: center;">Change Log: P.E.A.T.</h1>
+<h1 style="text-align: center;">CHANGELOG: P.E.A.T.</h1>
 <h2 style="text-align: center;">(P.sychophysical E.stimation of A.uditory T.hresholds)</h2>
+---
+
+## Version 2.1.0
+
+Date: July 17, 2024
+
+### Major Features
+1. Added maximum trials field to settings window. The app will display an error message and close if this number is exceeded.
+
+### Minor Features
+1. Compiled with console window exposed for monitoring. 
+2. Changed new trial delay after keystroke from 0.5 s to 1.0 s.
+<br>
+<br>
+
 ---
 
 ## Version 2.0.2
